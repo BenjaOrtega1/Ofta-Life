@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0C1628"/>
+  <rect x="70" y="70" width="1060" height="490" fill="#F3F6FC"/>
+  <path d="M152 315c70-116 156-174 258-174s188 58 258 174c-70 116-156 174-258 174s-188-58-258-174Z" fill="none" stroke="#1B45C0" stroke-width="22"/>
+  <circle cx="410" cy="315" r="76" fill="#1B45C0"/>
+  <text x="725" y="270" fill="#0C1628" font-family="Arial, sans-serif" font-size="86" font-weight="700">OftaLife</text>
+  <text x="728" y="340" fill="#0C1628" opacity=".7" font-family="Arial, sans-serif" font-size="34">Optica y consulta oftalmologica</text>
+  <text x="728" y="398" fill="#1B45C0" font-family="Arial, sans-serif" font-size="30">O'Higgins 296, Bulnes</text>
+</svg>

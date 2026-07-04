@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://oftalife.cl/sitemap.xml

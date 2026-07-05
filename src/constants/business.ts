@@ -1,6 +1,6 @@
 export const business = {
   businessName: "OftaLife",
-  tagline: "Optica y consulta oftalmologica",
+  tagline: "Óptica y consulta oftalmológica",
   city: "Bulnes",
   address: "O'Higgins 296, Bulnes, Chile",
   hours: "Lunes a viernes: 09:30-19:00",

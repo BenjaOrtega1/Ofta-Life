@@ -30,7 +30,7 @@ export function ReviewCard({ review, featured = false }: { review: GoogleReview;
       <div className="mt-auto pt-8">
         <div className="mb-5 inline-flex items-center gap-2 text-[11px] tracking-wide text-[#2A8A5B]">
           <BadgeCheck size={14} aria-hidden="true" />
-          Resena verificada en Google
+          Reseña verificada en Google
         </div>
         <a
           href={review.sourceUrl}

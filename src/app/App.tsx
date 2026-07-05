@@ -43,24 +43,24 @@ const CATEGORIES: Category[] = [
   {
     id: "cristales",
     title: "Cristales a medida",
-    eyebrow: "Precision diaria",
-    description: "Cristales antirreflejo, fotocromaticos y progresivos calibrados para tu receta, tu trabajo y tus rutinas.",
+    eyebrow: "Precisión diaria",
+    description: "Cristales antirreflejo, fotocromáticos y progresivos calibrados para tu receta, tu trabajo y tus rutinas.",
     image: IMG.crystal,
     Icon: Sparkles,
   },
   {
     id: "monturas",
-    title: "Monturas opticas",
+    title: "Monturas ópticas",
     eyebrow: "Calce y estilo",
-    description: "Seleccion curada de monturas livianas, resistentes y favorecedoras para uso intensivo todos los dias.",
+    description: "Selección curada de monturas livianas, resistentes y favorecedoras para uso intensivo todos los días.",
     image: IMG.frames,
     Icon: Glasses,
   },
   {
     id: "sol",
     title: "Lentes de sol",
-    eyebrow: "Proteccion urbana",
-    description: "Filtros UV y disenos con caracter para proteger la vista sin perder presencia.",
+    eyebrow: "Protección urbana",
+    description: "Filtros UV y diseños con carácter para proteger la vista sin perder presencia.",
     image: IMG.sun,
     Icon: Sun,
   },
@@ -68,15 +68,15 @@ const CATEGORIES: Category[] = [
     id: "contacto",
     title: "Lentes de contacto",
     eyebrow: "Libertad visual",
-    description: "Opciones diarias, mensuales y multifocales con acompanamiento para una adaptacion comoda.",
+    description: "Opciones diarias, mensuales y multifocales con acompañamiento para una adaptación cómoda.",
     image: IMG.contacts,
     Icon: Eye,
   },
   {
     id: "oftalmologia",
-    title: "Atencion oftalmologica",
-    eyebrow: "Cuidado clinico",
-    description: "Consulta profesional para detectar, corregir y acompanar cambios visuales con criterio medico.",
+    title: "Atención oftalmológica",
+    eyebrow: "Cuidado clínico",
+    description: "Consulta profesional para detectar, corregir y acompañar cambios visuales con criterio médico.",
     image: IMG.care,
     Icon: ShieldCheck,
   },
@@ -137,10 +137,10 @@ function Nav() {
   const [open, setOpen] = useState(false);
   const links = [
     ["Inicio", "inicio"],
-    ["Clinica", "clinica"],
-    ["Catalogo", "catalogo"],
-    ["Resenas", "resenas"],
-    ["Ubicacion", "ubicacion"],
+    ["Clínica", "clinica"],
+    ["Catálogo", "catalogo"],
+    ["Reseñas", "resenas"],
+    ["Ubicación", "ubicacion"],
   ];
 
   useEffect(() => {
@@ -162,7 +162,7 @@ function Nav() {
           "fixed left-0 right-0 top-[2px] z-[60] flex h-[64px] items-center justify-between px-5 transition-all duration-500 md:px-10 lg:px-14",
           scrolled ? "bg-white/88 shadow-[0_1px_0_rgba(12,22,40,0.08)] backdrop-blur-xl" : "bg-transparent",
         )}
-        aria-label="Navegacion principal"
+        aria-label="Navegación principal"
       >
         <a href="#inicio" aria-label="Ir al inicio">
           <Logo inverted={!scrolled} compact />
@@ -201,7 +201,7 @@ function Nav() {
               "grid size-10 place-items-center border transition-colors md:hidden",
               scrolled ? "border-foreground/10 bg-white/70 text-foreground" : "border-white/24 bg-black/12 text-white backdrop-blur",
             )}
-            aria-label={open ? "Cerrar menu" : "Abrir menu"}
+            aria-label={open ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={open}
           >
             {open ? <X size={22} /> : <Menu size={22} />}
@@ -216,7 +216,7 @@ function Nav() {
           animate={{ opacity: 1, clipPath: "inset(0)" }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
-          <button type="button" onClick={() => setOpen(false)} className="absolute right-5 top-5 grid size-11 place-items-center text-foreground" aria-label="Cerrar menu">
+          <button type="button" onClick={() => setOpen(false)} className="absolute right-5 top-5 grid size-11 place-items-center text-foreground" aria-label="Cerrar menú">
             <X size={23} />
           </button>
           <Logo />
@@ -258,7 +258,7 @@ function Hero() {
   return (
     <section id="inicio" ref={ref} className="relative min-h-[92vh] overflow-hidden bg-[#08101e] md:min-h-screen">
       <motion.div className="absolute inset-0 origin-center" style={{ y: bgY, scale: reduceMotion ? 1 : 1.08 }}>
-        <img src={IMG.hero} alt="Paciente probandose lentes en una optica contemporanea" className="h-full w-full object-cover" fetchPriority="high" />
+        <img src={IMG.hero} alt="Paciente probándose lentes en una óptica contemporánea" className="h-full w-full object-cover" fetchPriority="high" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,9,18,0.08),rgba(5,9,18,0.38)_48%,rgba(5,9,18,0.88))]" />
       </motion.div>
 
@@ -268,18 +268,18 @@ function Hero() {
             <Logo inverted />
           </div>
           <p className="max-w-[300px] text-[10px] leading-loose tracking-[0.14em] uppercase text-white/62 sm:max-w-[620px] sm:text-[12px] sm:tracking-[0.18em]" style={mono}>
-            Clinica visual & optica premium en {business.city}
+            Clínica visual & óptica premium en {business.city}
           </p>
           <h1 className="mt-5 max-w-[960px] text-balance font-normal leading-[0.92] tracking-[-0.02em] text-white sm:leading-[0.9] sm:tracking-[-0.025em]" style={{ ...serif, fontSize: "clamp(3rem, 11vw, 6rem)" }}>
             Ver mejor. <br />
-            <em>Vivirlo <span className="block sm:inline">todos los dias.</span></em>
+            <em>Vivirlo <span className="block sm:inline">todos los días.</span></em>
           </h1>
           <p className="mt-7 max-w-[330px] text-pretty text-[15px] leading-[1.75] text-white/66 md:max-w-[480px] md:text-[18px]">
-            Diagnostico experto, cristales de precision y una seleccion de lentes pensada para acompanar tu rutina con comodidad y presencia.
+            Diagnóstico experto, cristales de precisión y una selección de lentes pensada para acompañar tu rutina con comodidad y presencia.
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <a href="#catalogo" className="inline-flex items-center justify-center gap-2 bg-white px-6 py-3.5 text-[13px] tracking-wide text-foreground transition-colors hover:bg-white/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
-              Ver catalogo <ArrowRight size={15} />
+              Ver catálogo <ArrowRight size={15} />
             </a>
             <a href="#agendar" className="inline-flex items-center justify-center gap-2 border border-white/32 px-6 py-3.5 text-[13px] tracking-wide text-white transition-colors hover:border-white/62 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
               Agendar consulta
@@ -300,14 +300,14 @@ function Clinic() {
     <section id="clinica" className="bg-white px-6 py-20 md:px-12 md:py-28 lg:px-16">
       <div className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
         <FadeUp>
-          <p className="mb-5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>Clinica</p>
+          <p className="mb-5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>Clínica</p>
           <h2 className="max-w-[780px] text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(2.6rem, 7vw, 5rem)" }}>
             Cuidado visual privado, cercano y bien resuelto.
           </h2>
         </FadeUp>
         <FadeUp delay={0.1} className="max-w-[560px] lg:justify-self-end">
           <p className="text-pretty text-[16px] leading-[1.8] text-foreground/66">
-            OftaLife reune consulta oftalmologica y optica para que cada decision tenga continuidad: evaluacion, receta, seleccion, ajuste y seguimiento. La experiencia se siente humana porque cada lente se piensa para una vida real.
+           En OftaLife creemos que cuidar tu visión va mucho más allá de una consulta. Te acompañamos en cada paso: desde la evaluación inicial hasta la elección de tus lentes, sus ajustes y el seguimiento, para que cada solución se adapte realmente a tu forma de vivir.
           </p>
         </FadeUp>
       </div>
@@ -316,13 +316,13 @@ function Clinic() {
 
       <div className="grid gap-6 lg:grid-cols-[0.72fr_1.28fr]">
         <FadeUp className="relative min-h-[420px] overflow-hidden bg-secondary md:min-h-[560px]">
-          <img src={IMG.clinic} alt="Sala de espera luminosa de una clinica visual" className="h-full w-full object-cover" loading="lazy" />
+          <img src={IMG.clinic} alt="Sala de espera luminosa de una clínica visual" className="h-full w-full object-cover" loading="lazy" />
         </FadeUp>
         <div className="grid gap-5 sm:grid-cols-3 lg:grid-cols-1">
           {[
-            ["Evaluacion completa", "Mirada clinica antes de recomendar cristales, monturas o lentes de contacto."],
-            ["Asesoria optica", "Calce, materiales y tratamientos elegidos para tu uso diario, no solo para la vitrina."],
-            ["Acompanamiento", "Ajustes y orientacion posterior para que la adaptacion sea natural."],
+            ["Evaluación completa", "Mirada clínica antes de recomendar cristales, monturas o lentes de contacto."],
+            ["Asesoría óptica", "Calce, materiales y tratamientos elegidos para tu uso diario, no solo para la vitrina."],
+            ["Acompañamiento", "Ajustes y orientación posterior para que la adaptación sea natural."],
           ].map(([title, text], index) => (
             <FadeUp key={title} delay={index * 0.08}>
               <div className="group border-t border-foreground/10 py-7">
@@ -346,10 +346,10 @@ function Catalog() {
     <section id="catalogo" className="bg-[#f4f7fc] px-6 py-20 md:px-12 md:py-28 lg:px-16">
       <FadeUp className="mb-12 flex flex-col justify-between gap-7 md:flex-row md:items-end">
         <div>
-          <p className="mb-5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>Catalogo</p>
+          <p className="mb-5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>Catálogo</p>
           <h2 className="text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(2.6rem, 7vw, 5rem)" }}>
             Soluciones visuales <br />
-            <em>para tu dia a dia.</em>
+            <em>para tu día a día.</em>
           </h2>
         </div>
         <p className="max-w-[390px] text-pretty text-[15px] leading-[1.75] text-foreground/60">
@@ -357,7 +357,7 @@ function Catalog() {
         </p>
       </FadeUp>
 
-      <div className="mb-10 flex gap-2 overflow-x-auto pb-2" role="tablist" aria-label="Categorias del catalogo">
+      <div className="mb-10 flex gap-2 overflow-x-auto pb-2" role="tablist" aria-label="Categorías del catálogo">
         {["todos", ...CATEGORIES.map((item) => item.id)].map((id) => {
           const label = id === "todos" ? "Todos" : CATEGORIES.find((item) => item.id === id)?.title;
           return (
@@ -400,7 +400,7 @@ function Catalog() {
               <h3 className="text-[22px] font-medium leading-tight tracking-tight text-foreground">{item.title}</h3>
               <p className="mt-4 text-[14px] leading-[1.65] text-foreground/58">{item.description}</p>
               <a href="#agendar" className="mt-6 inline-flex items-center gap-2 text-[13px] tracking-wide text-foreground transition-colors hover:text-primary">
-                Consultar solucion <ArrowRight size={14} />
+                Consultar solución <ArrowRight size={14} />
               </a>
             </div>
           </motion.article>
@@ -417,8 +417,8 @@ function Footer() {
       <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <Logo inverted compact />
         <div className="flex flex-wrap gap-5 md:gap-7">
-          {["Clinica", "Catalogo", "Resenas", "Ubicacion", "Agendar"].map((label) => (
-            <a key={label} href={`#${label.toLowerCase()}`} className="text-[10px] tracking-[0.14em] uppercase text-white/28 transition hover:text-white/70" style={mono}>
+          {[["Clínica", "clinica"], ["Catálogo", "catalogo"], ["Reseñas", "resenas"], ["Ubicación", "ubicacion"], ["Agendar", "agendar"]].map(([label, id]) => (
+            <a key={id} href={`#${id}`} className="text-[10px] tracking-[0.14em] uppercase text-white/28 transition hover:text-white/70" style={mono}>
               {label}
             </a>
           ))}

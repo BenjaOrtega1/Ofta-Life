@@ -60,12 +60,12 @@ export function ReviewsSection() {
     <section id="resenas" className="overflow-hidden bg-white px-6 py-20 md:px-12 md:py-28 lg:px-16">
       <div className="mb-12 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="mb-5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>Resenas</p>
+          <p className="mb-5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>Reseñas</p>
           <h2 className="max-w-[760px] text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(2.6rem, 7vw, 5rem)" }}>
             Historias de quienes confiaron en OftaLife
           </h2>
           <p className="mt-6 max-w-[520px] text-pretty text-[15px] leading-[1.78] text-foreground/60">
-            Experiencias reales de pacientes que eligieron cuidar su vision con nosotros.
+            Experiencias reales de pacientes que eligieron cuidar su visión con nosotros.
           </p>
         </div>
 
@@ -77,7 +77,7 @@ export function ReviewsSection() {
             <div>
               <StarRating rating={rating ?? 0} />
               <p className="mt-2 text-[12px] text-foreground/48" style={mono}>
-                {googleReviewsSummary.totalReviews > 0 ? `${googleReviewsSummary.totalReviews} resenas en Google` : "Resenas verificables"}
+                {googleReviewsSummary.totalReviews > 0 ? `${googleReviewsSummary.totalReviews} reseñas en Google` : "Reseñas verificables"}
               </p>
             </div>
           </div>
@@ -98,10 +98,10 @@ export function ReviewsSection() {
         <div className="mx-auto max-w-[780px] bg-[#f4f7fc] px-7 py-12 text-center md:px-12">
           <StarRating rating={0} />
           <p className="mx-auto mt-5 max-w-[560px] text-[23px] leading-[1.45] text-foreground" style={serif}>
-            Pronto mostraremos aqui experiencias reales de pacientes de OftaLife.
+            Pronto mostraremos aquí experiencias reales de pacientes de OftaLife.
           </p>
           <p className="mx-auto mt-4 max-w-[540px] text-[14px] leading-[1.75] text-foreground/56">
-            Este espacio se actualiza manualmente con resenas reales copiadas desde Google Business Profile y enlazadas a su fuente.
+            Este espacio se actualiza manualmente con reseñas reales copiadas desde Google Business Profile y enlazadas a su fuente.
           </p>
           <a
             href={googleReviewsSummary.googleReviewsUrl}
@@ -123,7 +123,7 @@ export function ReviewsSection() {
           onBlur={() => setPaused(false)}
           onKeyDown={handleKeyDown}
           tabIndex={0}
-          aria-label="Carrusel de resenas verificadas de Google"
+          aria-label="Carrusel de reseñas verificadas de Google"
         >
           <div className="overflow-hidden" ref={emblaRef}>
             <div className="flex touch-pan-y gap-5 px-6 md:px-12 lg:px-16">
@@ -142,23 +142,23 @@ export function ReviewsSection() {
           </div>
 
           <div className="mt-8 flex items-center justify-between gap-5 px-6 md:px-12 lg:px-16">
-            <div className="flex gap-2" aria-label="Indicadores de resenas">
+            <div className="flex gap-2" aria-label="Indicadores de reseñas">
               {Array.from({ length: snapCount }).map((_, index) => (
                 <button
                   key={index}
                   type="button"
                   onClick={() => scrollTo(index)}
                   className={cx("h-1.5 transition-all", index === selectedIndex ? "w-8 bg-primary" : "w-3 bg-foreground/16 hover:bg-foreground/32")}
-                  aria-label={`Ir a resena ${index + 1}`}
+                  aria-label={`Ir a reseña ${index + 1}`}
                   aria-current={index === selectedIndex}
                 />
               ))}
             </div>
             <div className="flex gap-2">
-              <button type="button" onClick={scrollPrev} className="grid size-11 place-items-center border border-foreground/12 text-foreground transition hover:border-foreground/32" aria-label="Resena anterior">
+              <button type="button" onClick={scrollPrev} className="grid size-11 place-items-center border border-foreground/12 text-foreground transition hover:border-foreground/32" aria-label="Reseña anterior">
                 <ArrowLeft size={17} />
               </button>
-              <button type="button" onClick={scrollNext} className="grid size-11 place-items-center bg-primary text-white transition hover:bg-[#15399f]" aria-label="Resena siguiente">
+              <button type="button" onClick={scrollNext} className="grid size-11 place-items-center bg-primary text-white transition hover:bg-[#15399f]" aria-label="Reseña siguiente">
                 <ArrowRight size={17} />
               </button>
             </div>

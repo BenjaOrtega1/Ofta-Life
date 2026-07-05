@@ -268,7 +268,7 @@ function Hero() {
             <Logo inverted />
           </div>
           <p className="max-w-[300px] text-[10px] leading-loose tracking-[0.14em] uppercase text-white/62 sm:max-w-[620px] sm:text-[12px] sm:tracking-[0.18em]" style={mono}>
-            Clínica visual & óptica premium en {business.city}
+            Clínica visual & óptica premium
           </p>
           <h1 className="mt-5 max-w-[960px] text-balance font-normal leading-[0.92] tracking-[-0.02em] text-white sm:leading-[0.9] sm:tracking-[-0.025em]" style={{ ...serif, fontSize: "clamp(3rem, 11vw, 6rem)" }}>
             Ver mejor. <br />

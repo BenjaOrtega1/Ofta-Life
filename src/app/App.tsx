@@ -58,7 +58,7 @@ type HeroBeat = {
 
 const HERO_VIDEO_SRC = "/hero-tour.mp4";
 const HERO_POSTER_SRC = "/hero-poster.webp";
-const HERO_AUTO_SCROLL_DURATION_MS = 4500;
+const HERO_AUTO_SCROLL_DURATION_MS = 10500;
 
 const HERO_BEATS: HeroBeat[] = [
   {
@@ -351,8 +351,8 @@ function Hero() {
 
     const maxTime = Math.max(0, duration - 0.025);
     const targetTime = Math.min(maxTime, Math.max(0, nextProgress * duration));
-    if (Math.abs(video.currentTime - targetTime) <= 0.032) return;
-    if (!force && performance.now() - lastVideoSeekAtRef.current < 34) return;
+    if (Math.abs(video.currentTime - targetTime) <= 0.016) return;
+    if (!force && performance.now() - lastVideoSeekAtRef.current < 16) return;
 
     try {
       lastVideoSeekAtRef.current = performance.now();
@@ -464,7 +464,11 @@ function Hero() {
       previousScrollBehavior = null;
     };
 
-    const smoothScrollTo = (targetY: number, baseDuration: number) => {
+    const smoothScrollTo = (
+      targetY: number, 
+      baseDuration: number,
+      easingFn: (t: number) => number = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+    ) => {
       if (scrollAnimationRef.current !== null) return;
 
       const startY = window.scrollY;
@@ -479,8 +483,7 @@ function Hero() {
       const step = (now: number) => {
         const elapsed = now - startedAt;
         const t = Math.min(1, elapsed / duration);
-        // Easing cúbico in-out suave
-        const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        const ease = easingFn(t);
 
         window.scrollTo({ top: startY + distance * ease, left: 0, behavior: "auto" });
 
@@ -500,39 +503,37 @@ function Hero() {
     const startHeroAutoScroll = () => {
       const bounds = getHeroBounds();
       if (!bounds) return;
-      const fullDistance = Math.max(1, bounds.end - bounds.start);
-      const distance = bounds.end - window.scrollY;
+      
+      const targetY = bounds.end + window.innerHeight;
+      const fullDistance = Math.max(1, targetY - bounds.start);
+      const distance = targetY - window.scrollY;
+      
+      // La duración total es proporcional a la distancia
       const duration = Math.max(1800, HERO_AUTO_SCROLL_DURATION_MS * (distance / fullDistance));
-      smoothScrollTo(bounds.end, duration);
+      
+      const remainingHeroDist = Math.max(0, bounds.end - window.scrollY);
+      const distRatio = remainingHeroDist / distance;
+      
+      // Hacemos que la transición tome menos tiempo (aprox 8% del total) para que sea notablemente más rápida
+      const transitionTimeRatio = Math.min(1 - distRatio, 0.08);
+      const heroTimeRatio = 1 - transitionTimeRatio;
+      
+      const customEasing = (t: number) => {
+        if (t < heroTimeRatio) {
+          // Fase 1 (Hero): 100% lineal (velocidad uniforme)
+          const normT = t / heroTimeRatio;
+          return normT * distRatio;
+        } else {
+          // Fase 2 (Transición): Aceleración sutil
+          const normT = (t - heroTimeRatio) / transitionTimeRatio;
+          return distRatio + (normT * normT) * (1 - distRatio);
+        }
+      };
+      
+      smoothScrollTo(targetY, duration, customEasing);
     };
 
     const onWheel = (event: WheelEvent) => {
-      const bounds = getHeroBounds();
-      if (!bounds) return;
-
-      const scrollY = window.scrollY;
-      const transitionStart = bounds.end;
-      const transitionEnd = bounds.end + window.innerHeight;
-
-      // Detect transition zone
-      if (scrollY >= transitionStart - 10 && scrollY <= transitionEnd + 10) {
-        if (Math.abs(event.deltaY) > 5) {
-          const isScrollingDown = event.deltaY > 0;
-
-          if (!isScrollingDown && scrollY > transitionStart + 5) {
-            event.preventDefault();
-            smoothScrollTo(transitionStart, 2500);
-            return;
-          }
-
-          if (isScrollingDown && scrollY < transitionEnd - 5) {
-            event.preventDefault();
-            smoothScrollTo(transitionEnd, 2500);
-            return;
-          }
-        }
-      }
-
       if (event.deltaY < -2) {
         cancelAutoScroll();
         return;
@@ -574,31 +575,6 @@ function Hero() {
       if (startY === null || currentY === undefined) return;
 
       const deltaY = startY - currentY;
-      
-      const bounds = getHeroBounds();
-      if (bounds) {
-        const scrollY = window.scrollY;
-        const transitionStart = bounds.end;
-        const transitionEnd = bounds.end + window.innerHeight;
-
-        if (scrollY >= transitionStart - 10 && scrollY <= transitionEnd + 10) {
-          if (Math.abs(deltaY) > 12) {
-            const isScrollingDown = deltaY > 0;
-            if (!isScrollingDown && scrollY > transitionStart + 5) {
-              event.preventDefault();
-              smoothScrollTo(transitionStart, 2500);
-              touchStartYRef.current = null;
-              return;
-            }
-            if (isScrollingDown && scrollY < transitionEnd - 5) {
-              event.preventDefault();
-              smoothScrollTo(transitionEnd, 2500);
-              touchStartYRef.current = null;
-              return;
-            }
-          }
-        }
-      }
 
       if (deltaY < -12) {
         cancelAutoScroll();
@@ -628,8 +604,8 @@ function Hero() {
   }, [reduceMotion]);
 
   return (
-    <section id="inicio" ref={sectionRef} className="relative isolate min-h-[350vh] bg-[#070d1a] text-white">
-      <div className="sticky top-0 h-screen overflow-hidden bg-[#070d1a]">
+    <section id="inicio" ref={sectionRef} className="relative isolate min-h-[450vh] text-white">
+      <div className="sticky top-0 h-screen overflow-hidden">
         <video
           ref={videoRef}
           className="h-full w-full object-cover transform-gpu"

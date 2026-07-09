@@ -113,7 +113,7 @@ export function HeroDissolve({ progress }: { progress: MotionValue<number> }) {
       renderer.render(scene, camera);
     };
 
-    const rgb = hexToRgb("#fafafa");
+    const rgb = hexToRgb("#e8eef2");
     const geometry = new THREE.PlaneGeometry(2, 2);
     const material = new THREE.ShaderMaterial({
       vertexShader,

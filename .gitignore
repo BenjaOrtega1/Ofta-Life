@@ -5,3 +5,4 @@ dist/
 .env.*
 !.env.example
 version pasada/
+video/

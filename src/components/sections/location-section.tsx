@@ -28,7 +28,7 @@ function MapFrame() {
 
 export function LocationSection() {
   return (
-    <section id="ubicacion" className="bg-white text-foreground">
+    <section id="ubicacion" className="relative bg-white/60 text-foreground backdrop-blur-[60px]">
       <div className="grid gap-0 lg:grid-cols-[1.22fr_0.78fr] lg:items-stretch">
         <MapFrame />
         <div className="self-center px-6 py-16 md:px-12 md:py-24 lg:px-16">
@@ -70,7 +70,7 @@ export function LocationSection() {
         </div>
       </div>
 
-      <div id="agendar" className="bg-[#0c1628] px-6 py-16 text-white md:px-12 md:py-20 lg:px-16">
+      <div id="agendar" className="relative bg-[#0c1628]/80 px-6 py-16 text-white backdrop-blur-[60px] md:px-12 md:py-20 lg:px-16">
         <div className="mx-auto max-w-[980px] text-center">
           <span className="inline-flex items-center gap-2.5 text-white">
             <span className="inline-flex flex-col justify-center">

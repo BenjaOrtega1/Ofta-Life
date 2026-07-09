@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useState, type KeyboardEvent } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { googleReviews, googleReviewsSummary } from "../../data/google-reviews";
-import { ReviewCard } from "../ui/review-card";
-import { StarRating } from "../ui/star-rating";
+import { ArrowLeft, ArrowRight, Star } from "lucide-react";
+import { ReviewCard, type Review } from "../ui/review-card";
 
 const serif = { fontFamily: "'Instrument Serif', Georgia, serif" } as const;
 const mono = { fontFamily: "'DM Mono', monospace" } as const;
@@ -12,13 +10,46 @@ function cx(...classes: Array<string | false | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 
+const LOCAL_REVIEWS: Review[] = [
+  {
+    id: "1",
+    reviewerName: "Carlos M.",
+    reviewerInitials: "CM",
+    date: "Hace 2 semanas",
+    rating: 5,
+    reviewText: "Excelente atención. Me explicaron con detalle mi receta y me ayudaron a elegir unos cristales progresivos que se adaptan perfecto a mi trabajo frente al computador.",
+  },
+  {
+    id: "2",
+    reviewerName: "Valentina S.",
+    reviewerInitials: "VS",
+    date: "Hace 1 mes",
+    rating: 5,
+    reviewText: "El lugar es precioso y la evaluación clínica fue muy completa. Nunca había sentido que me asesoraran tan bien con las monturas.",
+  },
+  {
+    id: "3",
+    reviewerName: "Andrés F.",
+    reviewerInitials: "AF",
+    date: "Hace 2 meses",
+    rating: 5,
+    reviewText: "Muy profesionales. Fui por unos lentes de contacto y el acompañamiento durante la adaptación fue clave. Lo recomiendo totalmente.",
+  },
+  {
+    id: "4",
+    reviewerName: "Daniela G.",
+    reviewerInitials: "DG",
+    date: "Hace 3 meses",
+    rating: 5,
+    reviewText: "Me encantó el servicio. Rápido, claro y con mucha paciencia para resolver todas mis dudas sobre los tratamientos antirreflejo.",
+  }
+];
+
 export function ReviewsSection() {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ align: "center", loop: googleReviews.length > 2, skipSnaps: false });
+  const [emblaRef, emblaApi] = useEmblaCarousel({ align: "center", loop: LOCAL_REVIEWS.length > 2, skipSnaps: false });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [snapCount, setSnapCount] = useState(0);
   const [paused, setPaused] = useState(false);
-  const hasReviews = googleReviews.length > 0;
-  const rating = googleReviewsSummary.businessRating;
 
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
@@ -40,7 +71,7 @@ export function ReviewsSection() {
   }, [emblaApi]);
 
   useEffect(() => {
-    if (!emblaApi || paused || googleReviews.length < 2) return;
+    if (!emblaApi || paused || LOCAL_REVIEWS.length < 2) return;
     const timer = window.setInterval(() => emblaApi.scrollNext(), 6500);
     return () => window.clearInterval(timer);
   }, [emblaApi, paused]);
@@ -56,8 +87,10 @@ export function ReviewsSection() {
     }
   };
 
+  const avgRating = (LOCAL_REVIEWS.reduce((acc, curr) => acc + curr.rating, 0) / LOCAL_REVIEWS.length).toFixed(1);
+
   return (
-    <section id="resenas" className="overflow-hidden bg-white px-6 py-20 md:px-12 md:py-28 lg:px-16">
+    <section id="resenas" className="relative overflow-hidden bg-white/60 px-6 py-20 backdrop-blur-[60px] md:px-12 md:py-28 lg:px-16">
       <div className="mb-12 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="mb-5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>Reseñas</p>
@@ -72,49 +105,31 @@ export function ReviewsSection() {
         <div className="md:text-right">
           <div className="flex items-center gap-3 md:justify-end">
             <span className="text-[4rem] font-medium leading-none tracking-[-0.03em] text-foreground">
-              {rating ? rating.toFixed(1) : "--"}
+              {avgRating}
             </span>
             <div>
-              <StarRating rating={rating ?? 0} />
+              <div className="flex gap-1 text-[#ffc107]">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} size={16} fill="currentColor" strokeWidth={0} />
+                ))}
+              </div>
               <p className="mt-2 text-[12px] text-foreground/48" style={mono}>
-                {googleReviewsSummary.totalReviews > 0 ? `${googleReviewsSummary.totalReviews} reseñas en Google` : "Reseñas verificables"}
+                {LOCAL_REVIEWS.length} valoraciones locales
               </p>
             </div>
           </div>
-          <a
-            href={googleReviewsSummary.googleReviewsUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-3 inline-flex items-center gap-1.5 text-[12px] tracking-wide text-primary hover:underline"
-          >
-            Ver perfil en Google <ArrowRight size={12} />
-          </a>
         </div>
       </div>
 
       <div className="mb-12 h-px w-full bg-foreground/10" />
 
-      {!hasReviews && (
+      {LOCAL_REVIEWS.length === 0 ? (
         <div className="mx-auto max-w-[780px] bg-[#f4f7fc] px-7 py-12 text-center md:px-12">
-          <StarRating rating={0} />
           <p className="mx-auto mt-5 max-w-[560px] text-[23px] leading-[1.45] text-foreground" style={serif}>
-            Pronto mostraremos aquí experiencias reales de pacientes de OftaLife.
+            Pronto mostraremos aquí experiencias de nuestros pacientes.
           </p>
-          <p className="mx-auto mt-4 max-w-[540px] text-[14px] leading-[1.75] text-foreground/56">
-            Este espacio se actualiza manualmente con reseñas reales copiadas desde Google Business Profile y enlazadas a su fuente.
-          </p>
-          <a
-            href={googleReviewsSummary.googleReviewsUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-8 inline-flex items-center justify-center gap-2 bg-primary px-6 py-3.5 text-[13px] tracking-wide text-white transition hover:bg-[#15399f]"
-          >
-            Ver perfil en Google <ArrowRight size={14} />
-          </a>
         </div>
-      )}
-
-      {hasReviews && (
+      ) : (
         <div
           className="relative -mx-6 md:-mx-12 lg:-mx-16"
           onMouseEnter={() => setPaused(true)}
@@ -123,13 +138,13 @@ export function ReviewsSection() {
           onBlur={() => setPaused(false)}
           onKeyDown={handleKeyDown}
           tabIndex={0}
-          aria-label="Carrusel de reseñas verificadas de Google"
+          aria-label="Carrusel de reseñas"
         >
           <div className="overflow-hidden" ref={emblaRef}>
             <div className="flex touch-pan-y gap-5 px-6 md:px-12 lg:px-16">
-              {googleReviews.map((review, index) => (
+              {LOCAL_REVIEWS.map((review, index) => (
                 <div
-                  key={`${review.reviewerName}-${review.date}`}
+                  key={review.id}
                   className={cx(
                     "min-w-0 shrink-0 basis-[82%] md:basis-[520px]",
                     index !== selectedIndex && "md:basis-[420px]",

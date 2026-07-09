@@ -28,6 +28,11 @@ const IMG = {
   sun: "https://images.unsplash.com/photo-1615210768832-159ca3912a05?auto=format&fit=crop&w=900&q=82",
   contacts: "https://images.unsplash.com/photo-1591643529995-aef2e1e6f281?auto=format&fit=crop&w=900&q=82",
   care: "https://images.unsplash.com/photo-1516117525866-d85459db7457?auto=format&fit=crop&w=900&q=82",
+  party1: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=82",
+  party2: "https://images.unsplash.com/photo-1516478177764-9fe5bd7e9717?auto=format&fit=crop&w=1200&q=82",
+  party3: "https://images.unsplash.com/photo-1520627725969-90b4ebf8d4e9?auto=format&fit=crop&w=1200&q=82",
+  party4: "https://images.unsplash.com/photo-1496024840928-4c417adf211d?auto=format&fit=crop&w=1200&q=82",
+  party5: "https://images.unsplash.com/photo-1508215885820-4585e5610d44?auto=format&fit=crop&w=1200&q=82",
 };
 
 type Category = {
@@ -49,7 +54,7 @@ type HeroBeat = {
 
 const TOTAL_HERO_FRAMES = 486;
 const HERO_FRAME_BASE = "/sequence/webp";
-const HERO_AUTO_SCROLL_DURATION_MS = 9000;
+const HERO_AUTO_SCROLL_DURATION_MS = 4500;
 
 const HERO_BEATS: HeroBeat[] = [
   {
@@ -187,6 +192,7 @@ function Nav() {
     ["Inicio", "inicio"],
     ["Clínica", "clinica"],
     ["Catálogo", "catalogo"],
+    ["Lookbook", "lookbook"],
     ["Reseñas", "resenas"],
     ["Ubicación", "ubicacion"],
   ];
@@ -316,8 +322,22 @@ function Hero() {
   const reduceMotion = useReducedMotion();
   const [progress, setProgress] = useState(0);
   const [currentFrame, setCurrentFrame] = useState(1);
+  const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   const frameSrc = useMemo(() => heroFrameSrc(currentFrame), [currentFrame]);
   const activeBeatIndex = Math.min(HERO_BEATS.length - 1, Math.floor(progress * HERO_BEATS.length));
+
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
+    if (progress >= 0.99 && !hasAutoScrolled) {
+      setHasAutoScrolled(true);
+      timeout = setTimeout(() => {
+        document.getElementById("clinica")?.scrollIntoView({ behavior: "smooth" });
+      }, 700); // Retraso suave para no robar el momentum abruptamente
+    } else if (progress < 0.8) {
+      setHasAutoScrolled(false);
+    }
+    return () => clearTimeout(timeout);
+  }, [progress, hasAutoScrolled]);
 
   useEffect(() => {
     if (reduceMotion) {
@@ -532,7 +552,7 @@ function Hero() {
   }, [reduceMotion]);
 
   return (
-    <section id="inicio" ref={sectionRef} className="relative isolate min-h-[630vh] bg-[#070d1a] text-white">
+    <section id="inicio" ref={sectionRef} className="relative isolate min-h-[350vh] bg-[#070d1a] text-white">
       <div className="sticky top-0 h-screen overflow-hidden bg-[#070d1a]">
         <img src={frameSrc} alt="" aria-hidden="true" draggable={false} className="h-full w-full object-cover" fetchPriority="high" />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(4,8,16,0.82),rgba(4,8,16,0.34)_42%,rgba(4,8,16,0.18)_64%,rgba(4,8,16,0.58))]" />
@@ -677,40 +697,98 @@ function HeroTextOverlay({ beat, index }: { beat: HeroBeat; index: number }) {
   );
 }
 
-function Clinic() {
+function GlobalBackground() {
   return (
-    <section id="clinica" className="bg-white px-6 py-20 md:px-12 md:py-28 lg:px-16">
-      <div className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
-        <FadeUp>
-          <p className="mb-5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>Clínica</p>
-          <h2 className="max-w-[780px] text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(2.6rem, 7vw, 5rem)" }}>
-            Cuidado visual privado, cercano y bien resuelto.
+    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#fafafa]">
+      <motion.div
+        animate={{
+          x: ["0vw", "20vw", "-15vw", "0vw"],
+          y: ["0vh", "30vh", "-10vh", "0vh"],
+          scale: [1, 1.4, 0.9, 1],
+          rotate: [0, 90, 180, 360]
+        }}
+        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+        className="absolute -left-[10%] top-[10%] h-[60vw] w-[60vw] max-h-[800px] max-w-[800px] rounded-full bg-gradient-to-br from-[#1018df]/60 to-[#49d45f]/40 blur-[100px] md:blur-[160px]"
+      />
+      <motion.div
+        animate={{
+          x: ["0vw", "-20vw", "15vw", "0vw"],
+          y: ["0vh", "-20vh", "20vh", "0vh"],
+          scale: [1, 1.5, 0.8, 1],
+          rotate: [360, 180, 90, 0]
+        }}
+        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+        className="absolute -right-[10%] bottom-[10%] h-[70vw] w-[70vw] max-h-[1000px] max-w-[1000px] rounded-full bg-gradient-to-tl from-[#1018df]/40 to-purple-500/40 blur-[100px] md:blur-[180px]"
+      />
+    </div>
+  );
+}
+
+function Clinic() {
+  const features = [
+    {
+      title: "Evaluación completa",
+      text: "Mirada clínica antes de recomendar cristales, monturas o lentes de contacto.",
+      icon: ShieldCheck,
+      color: "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white",
+    },
+    {
+      title: "Asesoría óptica",
+      text: "Calce, materiales y tratamientos elegidos para tu uso diario, no solo para la vitrina.",
+      icon: Glasses,
+      color: "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white",
+    },
+    {
+      title: "Acompañamiento",
+      text: "Ajustes y orientación posterior para que la adaptación sea natural.",
+      icon: Sparkles,
+      color: "bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white",
+    },
+  ];
+
+  return (
+    <section id="clinica" className="relative bg-white/60 px-6 py-24 backdrop-blur-[60px] md:px-12 md:py-32 lg:px-16">
+      <div className="relative z-10 mx-auto max-w-[1280px]">
+        <FadeUp className="mb-16 flex flex-col items-center text-center">
+          <p className="mb-6 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>
+            Clínica Integral
+          </p>
+          <h2 className="mb-6 max-w-[800px] text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(2.8rem, 7vw, 5.5rem)" }}>
+            Cuidado visual privado, <br className="hidden md:block"/>
+            <em>cercano y bien resuelto.</em>
           </h2>
-        </FadeUp>
-        <FadeUp delay={0.1} className="max-w-[560px] lg:justify-self-end">
-          <p className="text-pretty text-[16px] leading-[1.8] text-foreground/66">
-           En OftaLife creemos que cuidar tu visión va mucho más allá de una consulta. Te acompañamos en cada paso: desde la evaluación inicial hasta la elección de tus lentes, sus ajustes y el seguimiento, para que cada solución se adapte realmente a tu forma de vivir.
+          <p className="max-w-[600px] text-pretty text-[16px] leading-[1.75] text-foreground/60">
+           En OftaLife creemos que cuidar tu visión va mucho más allá de una consulta. Te acompañamos en cada paso para que cada solución se adapte realmente a tu forma de vivir.
           </p>
         </FadeUp>
-      </div>
 
-      <DrawLine className="my-12 md:my-16" />
+        <div className="grid gap-6 md:grid-cols-3">
+          <FadeUp delay={0.1} className="group relative min-h-[360px] overflow-hidden rounded-3xl bg-secondary shadow-sm ring-1 ring-black/5 md:col-span-3 lg:h-[480px]">
+            <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#070d1a]/80 via-[#070d1a]/20 to-transparent" />
+            <img src={IMG.clinic} alt="Sala de espera luminosa de una clínica visual" className="h-full w-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" loading="lazy" />
+            <div className="absolute bottom-0 left-0 z-20 flex w-full flex-col justify-end p-8 md:p-12 lg:flex-row lg:items-end lg:justify-between">
+              <div className="max-w-[600px]">
+                <h3 className="mb-3 text-[28px] font-medium tracking-tight text-white md:text-[40px]" style={serif}>Un espacio para tu salud</h3>
+                <p className="text-[15px] leading-relaxed text-white/80 md:text-[17px]">
+                  Nuestras instalaciones están diseñadas para brindar una experiencia tranquila, precisa y confortable desde el momento en que llegas.
+                </p>
+              </div>
+              <div className="mt-6 lg:mt-0">
+                <a href="#agendar" className="inline-flex shrink-0 items-center gap-2 rounded-full bg-white px-6 py-3 text-[13px] font-medium tracking-wide text-foreground transition-all hover:bg-primary hover:text-white">
+                  Conocer más <ArrowRight size={15} />
+                </a>
+              </div>
+            </div>
+          </FadeUp>
 
-      <div className="grid gap-6 lg:grid-cols-[0.72fr_1.28fr]">
-        <FadeUp className="relative min-h-[420px] overflow-hidden bg-secondary md:min-h-[560px]">
-          <img src={IMG.clinic} alt="Sala de espera luminosa de una clínica visual" className="h-full w-full object-cover" loading="lazy" />
-        </FadeUp>
-        <div className="grid gap-5 sm:grid-cols-3 lg:grid-cols-1">
-          {[
-            ["Evaluación completa", "Mirada clínica antes de recomendar cristales, monturas o lentes de contacto."],
-            ["Asesoría óptica", "Calce, materiales y tratamientos elegidos para tu uso diario, no solo para la vitrina."],
-            ["Acompañamiento", "Ajustes y orientación posterior para que la adaptación sea natural."],
-          ].map(([title, text], index) => (
-            <FadeUp key={title} delay={index * 0.08}>
-              <div className="group border-t border-foreground/10 py-7">
-                <span className="mb-6 block text-[11px] text-foreground/36" style={mono}>0{index + 1}</span>
-                <h3 className="text-[20px] font-medium tracking-tight text-foreground">{title}</h3>
-                <p className="mt-3 max-w-[420px] text-[14px] leading-[1.7] text-foreground/56">{text}</p>
+          {features.map((feature, index) => (
+            <FadeUp key={feature.title} delay={0.2 + index * 0.1} className="group flex flex-col justify-between rounded-3xl bg-white p-8 shadow-sm ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-black/5">
+              <div>
+                <div className={cx("mb-8 flex size-14 items-center justify-center rounded-2xl transition-colors duration-300", feature.color)}>
+                  <feature.icon size={26} strokeWidth={1.5} />
+                </div>
+                <h3 className="mb-4 text-[22px] font-medium tracking-tight text-foreground">{feature.title}</h3>
+                <p className="text-[15px] leading-[1.7] text-foreground/60">{feature.text}</p>
               </div>
             </FadeUp>
           ))}
@@ -725,21 +803,19 @@ function Catalog() {
   const visible = active === "todos" ? CATEGORIES : CATEGORIES.filter((item) => item.id === active);
 
   return (
-    <section id="catalogo" className="bg-[#f4f7fc] px-6 py-20 md:px-12 md:py-28 lg:px-16">
-      <FadeUp className="mb-12 flex flex-col justify-between gap-7 md:flex-row md:items-end">
-        <div>
-          <p className="mb-5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>Catálogo</p>
-          <h2 className="text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(2.6rem, 7vw, 5rem)" }}>
-            Soluciones visuales <br />
-            <em>para tu día a día.</em>
-          </h2>
-        </div>
-        <p className="max-w-[390px] text-pretty text-[15px] leading-[1.75] text-foreground/60">
-          Una galeria curada para partir desde lo que necesitas resolver, no desde un producto suelto.
+    <section id="catalogo" className="relative bg-[#f4f7fc]/60 px-6 py-24 backdrop-blur-[60px] md:px-12 md:py-32 lg:px-16">
+      <FadeUp className="relative z-10 mb-16 flex flex-col items-center text-center">
+        <p className="mb-6 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>Catálogo</p>
+        <h2 className="mb-6 max-w-[800px] text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(3rem, 8vw, 6rem)" }}>
+          Soluciones visuales <br />
+          <em>para tu día a día.</em>
+        </h2>
+        <p className="max-w-[500px] text-pretty text-[16px] leading-[1.75] text-foreground/60">
+          Una galería curada para partir desde lo que necesitas resolver, no desde un producto suelto. Calidad, precisión y estilo.
         </p>
       </FadeUp>
 
-      <div className="mb-10 flex gap-2 overflow-x-auto pb-2" role="tablist" aria-label="Categorías del catálogo">
+      <div className="relative z-10 mb-14 flex flex-wrap justify-center gap-3 md:gap-4" role="tablist" aria-label="Categorías del catálogo">
         {["todos", ...CATEGORIES.map((item) => item.id)].map((id) => {
           const label = id === "todos" ? "Todos" : CATEGORIES.find((item) => item.id === id)?.title;
           return (
@@ -748,8 +824,8 @@ function Catalog() {
               type="button"
               onClick={() => setActive(id)}
               className={cx(
-                "shrink-0 border px-4 py-2.5 text-[12px] tracking-wide transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary",
-                active === id ? "border-primary bg-primary text-white" : "border-foreground/10 bg-white/72 text-foreground/62 hover:border-foreground/28 hover:text-foreground",
+                "rounded-full border px-6 py-3 text-[13px] tracking-wide transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary",
+                active === id ? "border-primary bg-primary text-white shadow-lg shadow-primary/20" : "border-foreground/10 bg-white/72 text-foreground/70 hover:border-foreground/30 hover:text-foreground hover:bg-white",
               )}
               role="tab"
               aria-selected={active === id}
@@ -760,34 +836,109 @@ function Catalog() {
         })}
       </div>
 
-      <motion.div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-5" layout>
+      <motion.div className="relative z-10 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3" layout>
         {visible.map((item, index) => (
           <motion.article
             key={item.id}
             layout
-            initial={{ opacity: 0, y: 22 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.04, ease: [0.22, 1, 0.36, 1] }}
-            className={cx("group relative overflow-hidden bg-white", visible.length === 1 && "xl:col-span-5")}
+            transition={{ duration: 0.6, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
+            className={cx("group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-xl hover:shadow-black/5", visible.length === 1 && "xl:col-span-3 xl:flex-row")}
           >
-            <div className={cx("relative overflow-hidden", visible.length === 1 ? "aspect-[16/7]" : "aspect-[4/5]")}>
-              <img src={item.image} alt={item.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.045]" loading="lazy" />
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,9,18,0)_20%,rgba(5,9,18,0.74))]" />
-              <div className="absolute left-5 top-5 grid size-10 place-items-center bg-white text-primary">
-                <item.Icon size={17} aria-hidden="true" />
+            <div className={cx("relative overflow-hidden", visible.length === 1 ? "xl:w-1/2 aspect-[16/9] xl:aspect-auto" : "aspect-[4/3]")}>
+              <img src={item.image} alt={item.title} className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-105" loading="lazy" />
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,9,18,0)_30%,rgba(5,9,18,0.6))]" />
+              <div className="absolute left-6 top-6 grid size-12 place-items-center rounded-full bg-white/95 text-primary shadow-sm backdrop-blur">
+                <item.Icon size={20} aria-hidden="true" />
               </div>
             </div>
-            <div className="p-6">
-              <p className="mb-3 text-[10px] tracking-[0.16em] uppercase text-primary" style={mono}>{item.eyebrow}</p>
-              <h3 className="text-[22px] font-medium leading-tight tracking-tight text-foreground">{item.title}</h3>
-              <p className="mt-4 text-[14px] leading-[1.65] text-foreground/58">{item.description}</p>
-              <a href="#agendar" className="mt-6 inline-flex items-center gap-2 text-[13px] tracking-wide text-foreground transition-colors hover:text-primary">
-                Consultar solución <ArrowRight size={14} />
+            <div className={cx("flex flex-1 flex-col p-8", visible.length === 1 && "xl:w-1/2 xl:justify-center")}>
+              <p className="mb-4 text-[11px] tracking-[0.18em] uppercase text-primary" style={mono}>{item.eyebrow}</p>
+              <h3 className="mb-4 text-[26px] font-medium leading-tight tracking-tight text-foreground">{item.title}</h3>
+              <p className="mb-8 text-[15px] leading-[1.7] text-foreground/60">{item.description}</p>
+              <a href="#agendar" className="mt-auto flex w-fit items-center gap-2 rounded-full bg-foreground/5 px-5 py-2.5 text-[13px] font-medium tracking-wide text-foreground transition-all group-hover:bg-primary group-hover:text-white">
+                Consultar solución <ArrowRight size={15} />
               </a>
             </div>
           </motion.article>
         ))}
       </motion.div>
+    </section>
+  );
+}
+
+function Lookbook() {
+  const images = [
+    "/galeria/WhatsApp Image 2026-07-08 at 8.02.48 PM (1).jpeg",
+    "/galeria/WhatsApp Image 2026-07-08 at 8.02.48 PM (2).jpeg",
+    "/galeria/WhatsApp Image 2026-07-08 at 8.02.48 PM (3).jpeg",
+    "/galeria/WhatsApp Image 2026-07-08 at 8.02.48 PM.jpeg",
+    "/galeria/WhatsApp Image 2026-07-08 at 8.02.49 PM (1).jpeg",
+    "/galeria/WhatsApp Image 2026-07-08 at 8.02.49 PM (2).jpeg",
+    "/galeria/WhatsApp Image 2026-07-08 at 8.02.49 PM (3).jpeg",
+    "/galeria/WhatsApp Image 2026-07-08 at 8.02.49 PM (4).jpeg",
+    "/galeria/WhatsApp Image 2026-07-08 at 8.02.49 PM (5).jpeg",
+    "/galeria/WhatsApp Image 2026-07-08 at 8.02.49 PM.jpeg",
+  ];
+
+  const row1 = images;
+  const row2 = [...images.slice(5, 10), ...images.slice(0, 5)];
+  
+  return (
+    <section id="lookbook" className="relative overflow-hidden bg-[#070d1a]/80 py-24 backdrop-blur-[60px] md:py-32">
+      <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes marquee-reverse {
+          0% { transform: translateX(-50%); }
+          100% { transform: translateX(0%); }
+        }
+        .animate-marquee {
+          animation: marquee 45s linear infinite;
+        }
+        .animate-marquee-reverse {
+          animation: marquee-reverse 50s linear infinite;
+        }
+        .animate-marquee:hover, .animate-marquee-reverse:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
+      <div className="relative z-10 mb-20 px-6 text-center md:px-12 lg:px-16">
+        <FadeUp>
+          <h2 className="text-balance font-normal leading-[0.95] tracking-[-0.02em] text-white" style={{ ...serif, fontSize: "clamp(2.8rem, 8vw, 5.5rem)" }}>
+            No es solo ver bien, <br className="hidden sm:block" />
+            <em className="text-[#49d45f]">es cómo te ves viviéndolo.</em>
+          </h2>
+          <p className="mx-auto mt-6 max-w-[540px] text-pretty text-[16px] leading-[1.75] text-white/70">
+            Tus lentes son parte de tu identidad. Descubre referencias visuales de cómo nuestra selección te acompaña en cada momento, incluso en las mejores fiestas.
+          </p>
+        </FadeUp>
+      </div>
+
+      <div className="relative flex flex-col gap-6 overflow-hidden">
+        {/* Fila 1 */}
+        <div className="flex w-max animate-marquee items-center gap-6 px-3">
+          {[...row1, ...row1].map((src, idx) => (
+            <div key={`r1-${idx}`} className="group relative h-[260px] w-[210px] shrink-0 overflow-hidden rounded-2xl md:h-[350px] md:w-[280px]">
+              <div className="absolute inset-0 z-10 bg-[#070d1a]/40 transition-colors duration-500 group-hover:bg-transparent" />
+              <img src={src} alt="Personas en fiesta usando lentes" className="h-full w-full object-cover transition duration-1000 ease-out group-hover:scale-110" loading="lazy" />
+            </div>
+          ))}
+        </div>
+
+        {/* Fila 2 (Reversa) */}
+        <div className="flex w-max animate-marquee-reverse items-center gap-6 px-3">
+          {[...row2, ...row2].map((src, idx) => (
+            <div key={`r2-${idx}`} className="group relative h-[260px] w-[210px] shrink-0 overflow-hidden rounded-2xl md:h-[350px] md:w-[280px]">
+              <div className="absolute inset-0 z-10 bg-[#070d1a]/40 transition-colors duration-500 group-hover:bg-transparent" />
+              <img src={src} alt="Personas en fiesta usando lentes" className="h-full w-full object-cover transition duration-1000 ease-out group-hover:scale-110" loading="lazy" />
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }
@@ -799,7 +950,7 @@ function Footer() {
       <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <Logo inverted compact />
         <div className="flex flex-wrap gap-5 md:gap-7">
-          {[["Clínica", "clinica"], ["Catálogo", "catalogo"], ["Reseñas", "resenas"], ["Ubicación", "ubicacion"], ["Agendar", "agendar"]].map(([label, id]) => (
+          {[["Clínica", "clinica"], ["Catálogo", "catalogo"], ["Lookbook", "lookbook"], ["Reseñas", "resenas"], ["Ubicación", "ubicacion"], ["Agendar", "agendar"]].map(([label, id]) => (
             <a key={id} href={`#${id}`} className="text-[10px] tracking-[0.14em] uppercase text-white/28 transition hover:text-white/70" style={mono}>
               {label}
             </a>
@@ -813,17 +964,19 @@ function Footer() {
 
 export default function App() {
   return (
-    <div className="bg-background text-foreground">
+    <>
       <ScrollBar />
       <Nav />
-      <main>
+      <main className="relative isolate">
+        <GlobalBackground />
         <Hero />
         <Clinic />
         <Catalog />
+        <Lookbook />
         <ReviewsSection />
         <LocationSection />
       </main>
       <Footer />
-    </div>
+    </>
   );
 }

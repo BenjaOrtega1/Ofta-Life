@@ -58,7 +58,7 @@ type HeroBeat = {
 
 const HERO_VIDEO_SRC = "/hero-tour.mp4";
 const HERO_POSTER_SRC = "/hero-poster.webp";
-const HERO_AUTO_SCROLL_DURATION_MS = 10500;
+const HERO_AUTO_SCROLL_DURATION_MS = 9500;
 
 const HERO_BEATS: HeroBeat[] = [
   {

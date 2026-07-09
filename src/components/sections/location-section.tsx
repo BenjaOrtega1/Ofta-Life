@@ -13,7 +13,7 @@ const locationDetails = [
 
 function MapFrame() {
   return (
-    <div className="relative min-h-[300px] overflow-hidden bg-[#f4f7fc] lg:min-h-[760px]" aria-label={`Mapa de ubicación de ${business.businessName} en ${business.address}`}>
+    <div className="relative h-full min-h-[400px] overflow-hidden bg-[#f4f7fc]" aria-label={`Mapa de ubicación de ${business.businessName} en ${business.address}`}>
       <iframe
         title={`Mapa de ${business.businessName} en ${business.city}`}
         src={business.googleMapsEmbedUrl}
@@ -34,10 +34,10 @@ export function LocationSection() {
         style={{ WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 100%)", maskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 100%)" }}
       />
       <div className="grid gap-0 lg:grid-cols-[1.22fr_0.78fr] lg:items-stretch lg:p-6 lg:gap-6">
-        <div className="rounded-[2.5rem] overflow-hidden lg:shadow-md">
+        <div className="rounded-[2.5rem] overflow-hidden lg:shadow-md h-full">
           <MapFrame />
         </div>
-        <div className="self-center px-6 py-12 md:px-12 md:py-16 lg:px-12 bg-white/60 backdrop-blur-md rounded-[2.5rem] border border-white/80 shadow-sm mx-4 lg:mx-0 my-4 lg:my-0">
+        <div className="flex flex-col justify-center px-6 py-12 md:px-12 md:py-16 lg:px-12 bg-white/60 backdrop-blur-md rounded-[2.5rem] border border-white/80 shadow-sm mx-4 lg:mx-0 my-4 lg:my-0 h-full">
           <p className="mb-5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>Ubicación</p>
           <h2 className="text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(2.2rem, 7vw, 5rem)" }}>
             Bulnes, atención cercana y agenda directa.

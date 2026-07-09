@@ -58,7 +58,7 @@ type HeroBeat = {
 
 const HERO_VIDEO_SRC = "/hero-tour.mp4";
 const HERO_POSTER_SRC = "/hero-poster.webp";
-const HERO_AUTO_SCROLL_DURATION_MS = 9500;
+const HERO_AUTO_SCROLL_DURATION_MS = 7500;
 
 const HERO_BEATS: HeroBeat[] = [
   {
@@ -133,6 +133,28 @@ const CATEGORIES: Category[] = [
     image: IMG.care,
     Icon: ShieldCheck,
   },
+];
+
+type Product = {
+  id: string;
+  categoryId: string;
+  name: string;
+  brand: string;
+  image: string;
+  description: string;
+};
+
+const PRODUCTS: Product[] = [
+  { id: "p1", categoryId: "cristales", name: "Progresivos Premium", brand: "Essilor", description: "Campo visual amplio para todas las distancias sin saltos molestos.", image: IMG.crystal },
+  { id: "p2", categoryId: "cristales", name: "Antirreflejo Blue", brand: "Zeiss", description: "Bloqueo de luz azul para quienes pasan horas frente a pantallas.", image: "https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=600&q=80" },
+  { id: "p3", categoryId: "monturas", name: "Montura Acetato Classic", brand: "OftaLife", description: "Diseño atemporal de acetato, resistente y elegante.", image: IMG.frames },
+  { id: "p4", categoryId: "monturas", name: "Montura Metálica Aviador", brand: "Ray-Ban", description: "Livianas y ajustables con soporte nasal de silicona.", image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=600&q=80" },
+  { id: "p5", categoryId: "monturas", name: "Marco Transparente", brand: "OftaLife", description: "Estilo moderno que ilumina el rostro, ideal para el día a día.", image: "https://images.unsplash.com/photo-1591076482161-42ce6da69f67?auto=format&fit=crop&w=600&q=80" },
+  { id: "p6", categoryId: "sol", name: "Gafas Urban Shades", brand: "OftaLife", description: "Protección UV400 completa con diseño de puente alto.", image: IMG.sun },
+  { id: "p7", categoryId: "sol", name: "Polarizados Sport", brand: "Oakley", description: "Reducción de destellos en actividades al aire libre.", image: "https://images.unsplash.com/photo-1508215885820-4585e5610d44?auto=format&fit=crop&w=600&q=80" },
+  { id: "p8", categoryId: "contacto", name: "Lentes Diarios", brand: "Acuvue", description: "Desechables de uso diario para máxima higiene y confort.", image: IMG.contacts },
+  { id: "p9", categoryId: "contacto", name: "Mensuales Tóricas", brand: "Biofinity", description: "Corrección de astigmatismo con alta oxigenación.", image: "https://images.unsplash.com/photo-1591643529995-aef2e1e6f281?auto=format&fit=crop&w=600&q=80" },
+  { id: "p10", categoryId: "oftalmologia", name: "Chequeo Preventivo", brand: "Servicio", description: "Evaluación integral de la salud visual.", image: IMG.care },
 ];
 
 function cx(...classes: Array<string | false | undefined>) {
@@ -333,6 +355,9 @@ function Hero() {
   const touchStartYRef = useRef<number | null>(null);
   const videoDurationRef = useRef(0);
   const lastVideoSeekAtRef = useRef(0);
+  const targetProgressRef = useRef(0);
+  const currentProgressRef = useRef(0);
+  const lerpRafRef = useRef<number | null>(null);
   const reduceMotion = useReducedMotion();
   const [progress, setProgress] = useState(0);
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
@@ -351,8 +376,8 @@ function Hero() {
 
     const maxTime = Math.max(0, duration - 0.025);
     const targetTime = Math.min(maxTime, Math.max(0, nextProgress * duration));
-    if (Math.abs(video.currentTime - targetTime) <= 0.016) return;
-    if (!force && performance.now() - lastVideoSeekAtRef.current < 16) return;
+    if (Math.abs(video.currentTime - targetTime) <= 0.005) return;
+    if (!force && performance.now() - lastVideoSeekAtRef.current < 8) return;
 
     try {
       lastVideoSeekAtRef.current = performance.now();
@@ -387,34 +412,49 @@ function Hero() {
       return undefined;
     }
 
-    const update = () => {
+    const updateTarget = () => {
       const section = sectionRef.current;
       if (!section) return;
 
       const rect = section.getBoundingClientRect();
       const scrollableDistance = Math.max(1, rect.height - window.innerHeight);
       const nextProgress = Math.min(1, Math.max(0, -rect.top / scrollableDistance));
-
-      syncHeroVideo(nextProgress);
-      setProgress((value) => (Math.abs(value - nextProgress) > 0.001 ? nextProgress : value));
+      targetProgressRef.current = nextProgress;
     };
 
-    const requestUpdate = () => {
+    const requestUpdateTarget = () => {
       if (rafRef.current !== null) return;
       rafRef.current = window.requestAnimationFrame(() => {
         rafRef.current = null;
-        update();
+        updateTarget();
       });
     };
 
-    update();
-    window.addEventListener("scroll", requestUpdate, { passive: true });
-    window.addEventListener("resize", requestUpdate, { passive: true });
+    const loopLerp = () => {
+      // Lerp (suavizado lineal)
+      currentProgressRef.current += (targetProgressRef.current - currentProgressRef.current) * 0.1;
+      
+      syncHeroVideo(currentProgressRef.current);
+      setProgress((value) => (Math.abs(value - currentProgressRef.current) > 0.001 ? currentProgressRef.current : value));
+
+      lerpRafRef.current = window.requestAnimationFrame(loopLerp);
+    };
+
+    updateTarget();
+    currentProgressRef.current = targetProgressRef.current;
+    setProgress(currentProgressRef.current);
+    syncHeroVideo(currentProgressRef.current, true);
+    
+    lerpRafRef.current = window.requestAnimationFrame(loopLerp);
+
+    window.addEventListener("scroll", requestUpdateTarget, { passive: true });
+    window.addEventListener("resize", requestUpdateTarget, { passive: true });
 
     return () => {
-      window.removeEventListener("scroll", requestUpdate);
-      window.removeEventListener("resize", requestUpdate);
+      window.removeEventListener("scroll", requestUpdateTarget);
+      window.removeEventListener("resize", requestUpdateTarget);
       if (rafRef.current !== null) window.cancelAnimationFrame(rafRef.current);
+      if (lerpRafRef.current !== null) window.cancelAnimationFrame(lerpRafRef.current);
     };
   }, [reduceMotion]);
 
@@ -464,13 +504,19 @@ function Hero() {
       previousScrollBehavior = null;
     };
 
+    let currentAutoScrollTarget: number | null = null;
+
     const smoothScrollTo = (
       targetY: number, 
       baseDuration: number,
       easingFn: (t: number) => number = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
     ) => {
-      if (scrollAnimationRef.current !== null) return;
+      if (scrollAnimationRef.current !== null) {
+        if (currentAutoScrollTarget === targetY) return;
+        cancelAutoScroll();
+      }
 
+      currentAutoScrollTarget = targetY;
       const startY = window.scrollY;
       const distance = targetY - startY;
       if (Math.abs(distance) <= 8) return;
@@ -514,8 +560,8 @@ function Hero() {
       const remainingHeroDist = Math.max(0, bounds.end - window.scrollY);
       const distRatio = remainingHeroDist / distance;
       
-      // Hacemos que la transición tome menos tiempo (aprox 8% del total) para que sea notablemente más rápida
-      const transitionTimeRatio = Math.min(1 - distRatio, 0.08);
+      // Mantenemos la duración absoluta de la transición original (9500 * 0.08 = 760ms)
+      const transitionTimeRatio = Math.min(1 - distRatio, 760 / duration);
       const heroTimeRatio = 1 - transitionTimeRatio;
       
       const customEasing = (t: number) => {
@@ -533,9 +579,30 @@ function Hero() {
       smoothScrollTo(targetY, duration, customEasing);
     };
 
+    const startHeroAutoScrollReverse = () => {
+      const bounds = getHeroBounds();
+      if (!bounds) return;
+      
+      const targetY = bounds.start;
+      const fullDistance = Math.max(1, bounds.end + window.innerHeight - bounds.start);
+      const distance = window.scrollY - targetY;
+      if (distance <= 8) return;
+      
+      const duration = Math.max(1800, HERO_AUTO_SCROLL_DURATION_MS * (distance / fullDistance));
+      
+      const customEasing = (t: number) => t; // Velocidad constante para rebobinar el video de forma fluida
+      
+      smoothScrollTo(targetY, duration, customEasing);
+    };
+
     const onWheel = (event: WheelEvent) => {
       if (event.deltaY < -2) {
-        cancelAutoScroll();
+        if (shouldAutoAdvance()) {
+          event.preventDefault();
+          startHeroAutoScrollReverse();
+        } else {
+          cancelAutoScroll();
+        }
         return;
       }
 
@@ -558,6 +625,12 @@ function Hero() {
         return;
       }
 
+      if (["ArrowUp", "PageUp", "Home"].includes(event.key) && shouldAutoAdvance()) {
+        event.preventDefault();
+        startHeroAutoScrollReverse();
+        return;
+      }
+
       if (!["ArrowDown", "PageDown", " ", "End"].includes(event.key) || !shouldAutoAdvance()) return;
 
       event.preventDefault();
@@ -577,8 +650,14 @@ function Hero() {
       const deltaY = startY - currentY;
 
       if (deltaY < -12) {
-        cancelAutoScroll();
-        touchStartYRef.current = currentY;
+        if (shouldAutoAdvance()) {
+          event.preventDefault();
+          touchStartYRef.current = null;
+          startHeroAutoScrollReverse();
+        } else {
+          cancelAutoScroll();
+          touchStartYRef.current = currentY;
+        }
         return;
       }
 
@@ -604,7 +683,7 @@ function Hero() {
   }, [reduceMotion]);
 
   return (
-    <section id="inicio" ref={sectionRef} className="relative isolate min-h-[450vh] text-white">
+    <section id="inicio" ref={sectionRef} className="relative isolate min-h-[350vh] text-white">
       <div className="sticky top-0 h-screen overflow-hidden">
         <video
           ref={videoRef}
@@ -860,72 +939,73 @@ function Clinic() {
 }
 
 function Catalog() {
-  const [active, setActive] = useState("todos");
-  const visible = active === "todos" ? CATEGORIES : CATEGORIES.filter((item) => item.id === active);
-
   return (
-    <section id="catalogo" className="relative bg-transparent px-6 py-20 md:px-12 md:py-32 lg:px-16">
-      <FadeUp className="relative z-10 mb-16 flex flex-col items-center text-center bg-white/60 backdrop-blur-md rounded-[2.5rem] p-8 md:p-16 border border-white/80 shadow-sm mx-auto max-w-[1000px]">
-        <p className="mb-6 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>Catálogo</p>
+    <section id="catalogo" className="relative bg-transparent px-6 py-20 md:px-12 md:py-32 lg:px-16 overflow-hidden">
+      <FadeUp className="relative z-10 mb-20 flex flex-col items-center text-center bg-white/60 backdrop-blur-md rounded-[2.5rem] p-8 md:p-16 border border-white/80 shadow-sm mx-auto max-w-[1000px]">
+        <p className="mb-6 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>Muestrario</p>
         <h2 className="mb-6 max-w-[800px] text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(2.4rem, 8vw, 6rem)" }}>
-          Soluciones visuales <br />
-          <em>para tu día a día.</em>
+          Explora nuestras <br />
+          <em>soluciones.</em>
         </h2>
         <p className="max-w-[500px] text-pretty text-[16px] leading-[1.75] text-foreground/60">
-          Una galería curada para partir desde lo que necesitas resolver, no desde un producto suelto. Calidad, precisión y estilo.
+          Un muestrario curado organizado por categoría. Desliza para descubrir modelos y opciones.
         </p>
       </FadeUp>
 
-      <div className="relative z-10 mb-14 -mx-6 flex overflow-x-auto px-6 pb-4 snap-x snap-mandatory gap-3 md:mx-0 md:flex-wrap md:justify-center md:px-0 md:pb-0 md:snap-none" role="tablist" aria-label="Categorías del catálogo" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-        <style>{`#catalogo div::-webkit-scrollbar { display: none; }`}</style>
-        {["todos", ...CATEGORIES.map((item) => item.id)].map((id) => {
-          const label = id === "todos" ? "Todos" : CATEGORIES.find((item) => item.id === id)?.title;
+      <div className="relative z-10 flex flex-col gap-24">
+        {CATEGORIES.map((category) => {
+          const catProducts = PRODUCTS.filter((p) => p.categoryId === category.id);
+          if (catProducts.length === 0) return null;
+
           return (
-            <button
-              key={id}
-              type="button"
-              onClick={() => setActive(id)}
-              className={cx(
-                "shrink-0 snap-start rounded-full border px-6 py-3 text-[13px] tracking-wide transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary",
-                active === id ? "border-primary bg-primary text-white shadow-lg shadow-primary/20" : "border-foreground/10 bg-white/72 text-foreground/70 hover:border-foreground/30 hover:text-foreground hover:bg-white",
-              )}
-              role="tab"
-              aria-selected={active === id}
-            >
-              {label}
-            </button>
+            <div key={category.id} className="flex flex-col xl:flex-row gap-8 xl:gap-16">
+              {/* Category Info */}
+              <FadeUp delay={0.1} className="xl:w-[320px] shrink-0 xl:sticky xl:top-32 self-start">
+                <div className="flex items-center gap-4 mb-5">
+                  <div className="grid size-12 place-items-center rounded-full bg-primary/10 text-primary">
+                    <category.Icon size={22} strokeWidth={1.5} />
+                  </div>
+                  <div>
+                    <p className="text-[11px] tracking-[0.18em] uppercase text-primary mb-1" style={mono}>{category.eyebrow}</p>
+                    <h3 className="text-[26px] font-medium tracking-tight text-foreground">{category.title}</h3>
+                  </div>
+                </div>
+                <p className="text-[15px] leading-[1.7] text-foreground/60 mb-6">{category.description}</p>
+              </FadeUp>
+
+              {/* Table / List */}
+              <div className="flex-1 w-full xl:min-w-0">
+                <div className="flex flex-col rounded-[2rem] bg-white shadow-sm ring-1 ring-black/5 overflow-hidden">
+                  {catProducts.map((product, index) => (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, y: 15 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-20px" }}
+                      transition={{ duration: 0.4, delay: index * 0.05 }}
+                      className="group flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 p-4 sm:p-6 border-b border-black/5 last:border-0 hover:bg-black/[0.02] transition-colors"
+                    >
+                      <img src={product.image} alt={product.name} className="size-16 sm:size-20 rounded-2xl object-cover ring-1 ring-black/10 shrink-0" loading="lazy" />
+                      
+                      <div className="flex flex-col flex-1 min-w-0">
+                        <p className="mb-1 text-[10px] tracking-[0.2em] uppercase text-primary/80" style={mono}>{product.brand}</p>
+                        <h4 className="text-[17px] font-medium leading-tight text-foreground truncate">{product.name}</h4>
+                        <p className="mt-1 text-[14px] leading-relaxed text-foreground/60 line-clamp-2 sm:line-clamp-1">{product.description}</p>
+                      </div>
+
+                      <div className="shrink-0 mt-2 sm:mt-0">
+                        <a href="#agendar" className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-[13px] font-medium tracking-wide text-foreground shadow-sm ring-1 ring-black/10 transition-all hover:bg-primary hover:text-white hover:ring-primary">
+                          Consultar <ArrowRight size={14} />
+                        </a>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </div>
           );
         })}
       </div>
-
-      <motion.div className="relative z-10 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3" layout>
-        {visible.map((item, index) => (
-          <motion.article
-            key={item.id}
-            layout
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
-            className={cx("group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-xl hover:shadow-black/5", visible.length === 1 && "xl:col-span-3 xl:flex-row")}
-          >
-            <div className={cx("relative overflow-hidden", visible.length === 1 ? "xl:w-1/2 aspect-[16/9] xl:aspect-auto" : "aspect-[4/3]")}>
-              <img src={item.image} alt={item.title} className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-105" loading="lazy" />
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,9,18,0)_30%,rgba(5,9,18,0.6))]" />
-              <div className="absolute left-6 top-6 grid size-12 place-items-center rounded-full bg-white/95 text-primary shadow-sm backdrop-blur">
-                <item.Icon size={20} aria-hidden="true" />
-              </div>
-            </div>
-            <div className={cx("flex flex-1 flex-col p-8", visible.length === 1 && "xl:w-1/2 xl:justify-center")}>
-              <p className="mb-4 text-[11px] tracking-[0.18em] uppercase text-primary" style={mono}>{item.eyebrow}</p>
-              <h3 className="mb-4 text-[26px] font-medium leading-tight tracking-tight text-foreground">{item.title}</h3>
-              <p className="mb-8 text-[15px] leading-[1.7] text-foreground/60">{item.description}</p>
-              <a href="#agendar" className="mt-auto flex w-fit items-center gap-2 rounded-full bg-foreground/5 px-5 py-2.5 text-[13px] font-medium tracking-wide text-foreground transition-all group-hover:bg-primary group-hover:text-white">
-                Consultar solución <ArrowRight size={15} />
-              </a>
-            </div>
-          </motion.article>
-        ))}
-      </motion.div>
     </section>
   );
 }

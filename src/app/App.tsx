@@ -526,24 +526,62 @@ function Hero() {
     };
   }, [reduceMotion]);
 
+  const currentFrameRef = useRef(1);
+  const loadedFramesRef = useRef(new Set<number>());
+
+  useEffect(() => {
+    currentFrameRef.current = currentFrame;
+  }, [currentFrame]);
+
   useEffect(() => {
     if (reduceMotion) return undefined;
 
     let cancelled = false;
-    let frame = 1;
     let timeoutId: number | undefined;
 
-    const preloadNext = () => {
-      if (cancelled || frame > TOTAL_HERO_FRAMES) return;
+    const preload = () => {
+      if (cancelled) return;
+
+      const current = currentFrameRef.current;
+      let targetFrame = current;
+
+      while (loadedFramesRef.current.has(targetFrame) && targetFrame <= TOTAL_HERO_FRAMES) {
+        targetFrame++;
+      }
+
+      if (targetFrame > TOTAL_HERO_FRAMES || targetFrame > current + 40) {
+        let backFrame = current - 1;
+        while (loadedFramesRef.current.has(backFrame) && backFrame >= 1) {
+          backFrame--;
+        }
+        if (backFrame >= 1) {
+          targetFrame = backFrame;
+        } else if (loadedFramesRef.current.size >= TOTAL_HERO_FRAMES) {
+          return;
+        } else {
+          targetFrame = 1;
+          while (loadedFramesRef.current.has(targetFrame) && targetFrame <= TOTAL_HERO_FRAMES) {
+            targetFrame++;
+          }
+        }
+      }
 
       const image = new Image();
       image.decoding = "async";
-      image.src = heroFrameSrc(frame);
-      frame += 1;
-      timeoutId = window.setTimeout(preloadNext, frame < 72 ? 12 : 28);
+      
+      const onComplete = () => {
+        loadedFramesRef.current.add(targetFrame);
+        if (!cancelled) {
+          timeoutId = window.setTimeout(preload, 5);
+        }
+      };
+
+      image.onload = onComplete;
+      image.onerror = onComplete;
+      image.src = heroFrameSrc(targetFrame);
     };
 
-    preloadNext();
+    preload();
 
     return () => {
       cancelled = true;

@@ -52,8 +52,8 @@ type HeroBeat = {
   cta?: boolean;
 };
 
-const TOTAL_HERO_FRAMES = 486;
-const HERO_FRAME_BASE = "/sequence/webp";
+const HERO_VIDEO_SRC = "/hero-tour.mp4";
+const HERO_POSTER_SRC = "/hero-poster.webp";
 const HERO_AUTO_SCROLL_DURATION_MS = 4500;
 
 const HERO_BEATS: HeroBeat[] = [
@@ -133,10 +133,6 @@ const CATEGORIES: Category[] = [
 
 function cx(...classes: Array<string | false | undefined>) {
   return classes.filter(Boolean).join(" ");
-}
-
-function heroFrameSrc(frame: number) {
-  return `${HERO_FRAME_BASE}/frame_${String(frame).padStart(5, "0")}.webp`;
 }
 
 function FadeUp({ children, className = "", delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
@@ -316,15 +312,43 @@ function Nav() {
 
 function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const rafRef = useRef<number | null>(null);
   const scrollAnimationRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
+  const videoDurationRef = useRef(0);
+  const lastVideoSeekAtRef = useRef(0);
   const reduceMotion = useReducedMotion();
   const [progress, setProgress] = useState(0);
-  const [currentFrame, setCurrentFrame] = useState(1);
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
-  const frameSrc = useMemo(() => heroFrameSrc(currentFrame), [currentFrame]);
   const activeBeatIndex = Math.min(HERO_BEATS.length - 1, Math.floor(progress * HERO_BEATS.length));
+
+  const syncHeroVideo = (nextProgress: number, force = false) => {
+    const video = videoRef.current;
+    const duration = videoDurationRef.current || video?.duration || 0;
+    if (!video || !Number.isFinite(duration) || duration <= 0) return;
+
+    const maxTime = Math.max(0, duration - 0.025);
+    const targetTime = Math.min(maxTime, Math.max(0, nextProgress * duration));
+    if (Math.abs(video.currentTime - targetTime) <= 0.032) return;
+    if (!force && performance.now() - lastVideoSeekAtRef.current < 34) return;
+
+    try {
+      lastVideoSeekAtRef.current = performance.now();
+      video.currentTime = targetTime;
+    } catch {
+      // Some browsers reject seeks before the video is fully ready.
+    }
+  };
+
+  const handleVideoReady = () => {
+    const video = videoRef.current;
+    if (!video || !Number.isFinite(video.duration)) return;
+
+    video.pause();
+    videoDurationRef.current = video.duration;
+    syncHeroVideo(progress, true);
+  };
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
@@ -342,7 +366,7 @@ function Hero() {
   useEffect(() => {
     if (reduceMotion) {
       setProgress(0);
-      setCurrentFrame(1);
+      syncHeroVideo(0, true);
       return undefined;
     }
 
@@ -353,10 +377,9 @@ function Hero() {
       const rect = section.getBoundingClientRect();
       const scrollableDistance = Math.max(1, rect.height - window.innerHeight);
       const nextProgress = Math.min(1, Math.max(0, -rect.top / scrollableDistance));
-      const nextFrame = Math.min(TOTAL_HERO_FRAMES, Math.max(1, Math.round(nextProgress * (TOTAL_HERO_FRAMES - 1)) + 1));
 
+      syncHeroVideo(nextProgress);
       setProgress((value) => (Math.abs(value - nextProgress) > 0.001 ? nextProgress : value));
-      setCurrentFrame((value) => (value === nextFrame ? value : nextFrame));
     };
 
     const requestUpdate = () => {
@@ -526,73 +549,23 @@ function Hero() {
     };
   }, [reduceMotion]);
 
-  const currentFrameRef = useRef(1);
-  const loadedFramesRef = useRef(new Set<number>());
-
-  useEffect(() => {
-    currentFrameRef.current = currentFrame;
-  }, [currentFrame]);
-
-  useEffect(() => {
-    if (reduceMotion) return undefined;
-
-    let cancelled = false;
-    let timeoutId: number | undefined;
-
-    const preload = () => {
-      if (cancelled) return;
-
-      const current = currentFrameRef.current;
-      let targetFrame = current;
-
-      while (loadedFramesRef.current.has(targetFrame) && targetFrame <= TOTAL_HERO_FRAMES) {
-        targetFrame++;
-      }
-
-      if (targetFrame > TOTAL_HERO_FRAMES || targetFrame > current + 40) {
-        let backFrame = current - 1;
-        while (loadedFramesRef.current.has(backFrame) && backFrame >= 1) {
-          backFrame--;
-        }
-        if (backFrame >= 1) {
-          targetFrame = backFrame;
-        } else if (loadedFramesRef.current.size >= TOTAL_HERO_FRAMES) {
-          return;
-        } else {
-          targetFrame = 1;
-          while (loadedFramesRef.current.has(targetFrame) && targetFrame <= TOTAL_HERO_FRAMES) {
-            targetFrame++;
-          }
-        }
-      }
-
-      const image = new Image();
-      image.decoding = "async";
-      
-      const onComplete = () => {
-        loadedFramesRef.current.add(targetFrame);
-        if (!cancelled) {
-          timeoutId = window.setTimeout(preload, 5);
-        }
-      };
-
-      image.onload = onComplete;
-      image.onerror = onComplete;
-      image.src = heroFrameSrc(targetFrame);
-    };
-
-    preload();
-
-    return () => {
-      cancelled = true;
-      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
-    };
-  }, [reduceMotion]);
-
   return (
     <section id="inicio" ref={sectionRef} className="relative isolate min-h-[350vh] bg-[#070d1a] text-white">
       <div className="sticky top-0 h-screen overflow-hidden bg-[#070d1a]">
-        <img src={frameSrc} alt="" aria-hidden="true" draggable={false} className="h-full w-full object-cover" fetchPriority="high" />
+        <video
+          ref={videoRef}
+          className="h-full w-full object-cover transform-gpu"
+          poster={HERO_POSTER_SRC}
+          muted
+          playsInline
+          preload="auto"
+          tabIndex={-1}
+          aria-hidden="true"
+          onLoadedMetadata={handleVideoReady}
+          onLoadedData={handleVideoReady}
+        >
+          <source src={HERO_VIDEO_SRC} type="video/mp4" />
+        </video>
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(4,8,16,0.82),rgba(4,8,16,0.34)_42%,rgba(4,8,16,0.18)_64%,rgba(4,8,16,0.58))]" />
         <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(4,8,16,0.76),rgba(4,8,16,0.08)_46%,rgba(4,8,16,0.28))]" />
         <HeroTextOverlay beat={HERO_BEATS[activeBeatIndex]} index={activeBeatIndex} />

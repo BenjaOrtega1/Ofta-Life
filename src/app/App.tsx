@@ -15,6 +15,10 @@ import {
   X,
 } from "lucide-react";
 import { business, whatsappUrl } from "../constants/business";
+import { ReviewCard } from "../components/ui/review-card";
+import { StarRating } from "../components/ui/star-rating";
+import { HeroDissolve } from "../components/ui/hero-dissolve";
+import { Plasma } from "../components/ui/plasma";
 import { LocationSection } from "../components/sections/location-section";
 import { ReviewsSection } from "../components/sections/reviews-section";
 
@@ -220,57 +224,68 @@ function Nav() {
 
   return (
     <>
-      <nav
-        className={cx(
-          "fixed left-0 right-0 top-[2px] z-[60] flex h-[64px] items-center justify-between px-5 transition-all duration-500 md:px-10 lg:px-14",
-          scrolled ? "bg-white/88 shadow-[0_1px_0_rgba(12,22,40,0.08)] backdrop-blur-xl" : "bg-transparent",
-        )}
-        aria-label="Navegación principal"
-      >
-        <a href="#inicio" aria-label="Ir al inicio">
-          <Logo inverted={!scrolled} compact />
-        </a>
+      <div className={cx(
+        "fixed inset-x-0 top-0 z-[60] flex justify-center transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
+        scrolled ? "p-3 md:p-5" : "p-0"
+      )}>
+        <nav
+          className={cx(
+            "flex w-full max-w-[1200px] items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
+            scrolled 
+              ? "h-[64px] rounded-[32px] bg-white/75 shadow-[0_8px_32px_rgba(12,22,40,0.06)] backdrop-blur-xl border border-white/60 px-5 md:px-8" 
+              : "h-[88px] rounded-none bg-transparent border-transparent px-6 md:px-12 lg:px-16"
+          )}
+          aria-label="Navegación principal"
+        >
+          <a href="#inicio" aria-label="Ir al inicio" className="relative z-10">
+            <Logo inverted={!scrolled} compact />
+          </a>
 
-        <div className="hidden items-center gap-7 md:flex">
-          {links.map(([label, id]) => (
+          <div className="hidden items-center gap-2 md:flex">
+            {links.map(([label, id]) => (
+              <a
+                key={id}
+                href={`#${id}`}
+                className={cx(
+                  "relative px-4 py-2 text-[13px] font-medium tracking-wide transition-all duration-300 rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary",
+                  scrolled ? "text-foreground/70 hover:text-foreground hover:bg-foreground/5" : "text-white/80 hover:text-white hover:bg-white/10",
+                )}
+              >
+                {label}
+              </a>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-3">
             <a
-              key={id}
-              href={`#${id}`}
+              href="#agendar"
               className={cx(
-                "text-[12px] tracking-wide transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary",
-                scrolled ? "text-foreground/68 hover:text-foreground" : "text-white/72 hover:text-white",
+                "hidden items-center gap-2 px-6 py-2.5 rounded-full text-[13px] font-medium tracking-wide transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary md:inline-flex",
+                scrolled 
+                  ? "bg-primary text-white shadow-md shadow-primary/20 hover:shadow-lg hover:bg-primary/90 hover:scale-[1.02]" 
+                  : "bg-white text-foreground hover:bg-white/90 hover:scale-[1.02]",
               )}
             >
-              {label}
+              <CalendarCheck size={15} />
+              Agendar
             </a>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-3">
-          <a
-            href="#agendar"
-            className={cx(
-              "hidden items-center gap-2 px-5 py-2.5 text-[12px] tracking-wide transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary md:inline-flex",
-              scrolled ? "bg-primary text-white hover:bg-[#15399f]" : "bg-white text-foreground hover:bg-white/90",
-            )}
-          >
-            <CalendarCheck size={14} />
-            Agendar
-          </a>
-          <button
-            type="button"
-            onClick={() => setOpen((value) => !value)}
-            className={cx(
-              "grid size-10 place-items-center border transition-colors md:hidden",
-              scrolled ? "border-foreground/10 bg-white/70 text-foreground" : "border-white/24 bg-black/12 text-white backdrop-blur",
-            )}
-            aria-label={open ? "Cerrar menú" : "Abrir menú"}
-            aria-expanded={open}
-          >
-            {open ? <X size={22} /> : <Menu size={22} />}
-          </button>
-        </div>
-      </nav>
+            <button
+              type="button"
+              onClick={() => setOpen((value) => !value)}
+              className={cx(
+                "grid size-[44px] place-items-center rounded-full border transition-all duration-300 md:hidden",
+                scrolled 
+                  ? "border-foreground/10 bg-white text-foreground shadow-sm" 
+                  : "border-white/20 bg-white/10 text-white backdrop-blur-md hover:bg-white/20",
+              )}
+              aria-label={open ? "Cerrar menú" : "Abrir menú"}
+              aria-expanded={open}
+            >
+              {open ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
+        </nav>
+      </div>
 
       {open && (
         <motion.div
@@ -323,6 +338,12 @@ function Hero() {
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   const activeBeatIndex = Math.min(HERO_BEATS.length - 1, Math.floor(progress * HERO_BEATS.length));
 
+  // Rastrea el momento en el que el contenedor completo de 350vh empieza a salir de la pantalla
+  const { scrollYProgress: exitProgress } = useScroll({
+    target: sectionRef,
+    offset: ["end end", "end start"],
+  });
+
   const syncHeroVideo = (nextProgress: number, force = false) => {
     const video = videoRef.current;
     const duration = videoDurationRef.current || video?.duration || 0;
@@ -351,17 +372,13 @@ function Hero() {
   };
 
   useEffect(() => {
-    let timeout: ReturnType<typeof setTimeout>;
-    if (progress >= 0.99 && !hasAutoScrolled) {
-      setHasAutoScrolled(true);
-      timeout = setTimeout(() => {
-        document.getElementById("clinica")?.scrollIntoView({ behavior: "smooth" });
-      }, 700); // Retraso suave para no robar el momentum abruptamente
-    } else if (progress < 0.8) {
+    // Hemos eliminado el auto-scroll para que el WebGL Dissolve sea el único puente hacia la sección Clínica.
+    if (progress < 0.8) {
       setHasAutoScrolled(false);
+    } else if (progress >= 0.99) {
+      setHasAutoScrolled(true);
     }
-    return () => clearTimeout(timeout);
-  }, [progress, hasAutoScrolled]);
+  }, [progress]);
 
   useEffect(() => {
     if (reduceMotion) {
@@ -447,16 +464,14 @@ function Hero() {
       previousScrollBehavior = null;
     };
 
-    const startAutoScroll = () => {
-      const bounds = getHeroBounds();
-      if (!bounds || scrollAnimationRef.current !== null) return;
+    const smoothScrollTo = (targetY: number, baseDuration: number) => {
+      if (scrollAnimationRef.current !== null) return;
 
       const startY = window.scrollY;
-      const distance = bounds.end - startY;
-      if (distance <= 8) return;
+      const distance = targetY - startY;
+      if (Math.abs(distance) <= 8) return;
 
-      const fullDistance = Math.max(1, bounds.end - bounds.start);
-      const duration = Math.max(1800, HERO_AUTO_SCROLL_DURATION_MS * (distance / fullDistance));
+      const duration = baseDuration;
       const startedAt = performance.now();
 
       forceInstantScroll();
@@ -464,7 +479,10 @@ function Hero() {
       const step = (now: number) => {
         const elapsed = now - startedAt;
         const t = Math.min(1, elapsed / duration);
-        window.scrollTo({ top: startY + distance * t, left: 0, behavior: "auto" });
+        // Easing cúbico in-out suave
+        const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+        window.scrollTo({ top: startY + distance * ease, left: 0, behavior: "auto" });
 
         if (t < 1) {
           scrollAnimationRef.current = window.requestAnimationFrame(step);
@@ -472,14 +490,49 @@ function Hero() {
         }
 
         scrollAnimationRef.current = null;
-        window.scrollTo({ top: bounds.end, left: 0, behavior: "auto" });
+        window.scrollTo({ top: targetY, left: 0, behavior: "auto" });
         restoreScrollBehavior();
       };
 
       scrollAnimationRef.current = window.requestAnimationFrame(step);
     };
 
+    const startHeroAutoScroll = () => {
+      const bounds = getHeroBounds();
+      if (!bounds) return;
+      const fullDistance = Math.max(1, bounds.end - bounds.start);
+      const distance = bounds.end - window.scrollY;
+      const duration = Math.max(1800, HERO_AUTO_SCROLL_DURATION_MS * (distance / fullDistance));
+      smoothScrollTo(bounds.end, duration);
+    };
+
     const onWheel = (event: WheelEvent) => {
+      const bounds = getHeroBounds();
+      if (!bounds) return;
+
+      const scrollY = window.scrollY;
+      const transitionStart = bounds.end;
+      const transitionEnd = bounds.end + window.innerHeight;
+
+      // Detect transition zone
+      if (scrollY >= transitionStart - 10 && scrollY <= transitionEnd + 10) {
+        if (Math.abs(event.deltaY) > 5) {
+          const isScrollingDown = event.deltaY > 0;
+
+          if (!isScrollingDown && scrollY > transitionStart + 5) {
+            event.preventDefault();
+            smoothScrollTo(transitionStart, 2500);
+            return;
+          }
+
+          if (isScrollingDown && scrollY < transitionEnd - 5) {
+            event.preventDefault();
+            smoothScrollTo(transitionEnd, 2500);
+            return;
+          }
+        }
+      }
+
       if (event.deltaY < -2) {
         cancelAutoScroll();
         return;
@@ -488,7 +541,7 @@ function Hero() {
       if (event.deltaY <= 2 || !shouldAutoAdvance()) return;
 
       event.preventDefault();
-      startAutoScroll();
+      startHeroAutoScroll();
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -507,7 +560,7 @@ function Hero() {
       if (!["ArrowDown", "PageDown", " ", "End"].includes(event.key) || !shouldAutoAdvance()) return;
 
       event.preventDefault();
-      startAutoScroll();
+      startHeroAutoScroll();
     };
 
     const onTouchStart = (event: TouchEvent) => {
@@ -521,6 +574,31 @@ function Hero() {
       if (startY === null || currentY === undefined) return;
 
       const deltaY = startY - currentY;
+      
+      const bounds = getHeroBounds();
+      if (bounds) {
+        const scrollY = window.scrollY;
+        const transitionStart = bounds.end;
+        const transitionEnd = bounds.end + window.innerHeight;
+
+        if (scrollY >= transitionStart - 10 && scrollY <= transitionEnd + 10) {
+          if (Math.abs(deltaY) > 12) {
+            const isScrollingDown = deltaY > 0;
+            if (!isScrollingDown && scrollY > transitionStart + 5) {
+              event.preventDefault();
+              smoothScrollTo(transitionStart, 2500);
+              touchStartYRef.current = null;
+              return;
+            }
+            if (isScrollingDown && scrollY < transitionEnd - 5) {
+              event.preventDefault();
+              smoothScrollTo(transitionEnd, 2500);
+              touchStartYRef.current = null;
+              return;
+            }
+          }
+        }
+      }
 
       if (deltaY < -12) {
         cancelAutoScroll();
@@ -532,7 +610,7 @@ function Hero() {
 
       event.preventDefault();
       touchStartYRef.current = null;
-      startAutoScroll();
+      startHeroAutoScroll();
     };
 
     window.addEventListener("wheel", onWheel, { passive: false });
@@ -568,6 +646,7 @@ function Hero() {
         </video>
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(4,8,16,0.82),rgba(4,8,16,0.34)_42%,rgba(4,8,16,0.18)_64%,rgba(4,8,16,0.58))]" />
         <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(4,8,16,0.76),rgba(4,8,16,0.08)_46%,rgba(4,8,16,0.28))]" />
+        <HeroDissolve progress={exitProgress} />
         <HeroTextOverlay beat={HERO_BEATS[activeBeatIndex]} index={activeBeatIndex} />
         <div className="pointer-events-none absolute bottom-5 left-5 right-5 z-20 h-px overflow-hidden bg-white/22 md:bottom-8 md:left-12 md:right-12 lg:left-16 lg:right-16" aria-hidden="true">
           <span className="block h-full origin-left bg-[#49d45f]" style={{ transform: `scaleX(${progress})` }} />
@@ -710,27 +789,18 @@ function HeroTextOverlay({ beat, index }: { beat: HeroBeat; index: number }) {
 
 function GlobalBackground() {
   return (
-    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#fafafa]">
-      <motion.div
-        animate={{
-          x: ["0vw", "20vw", "-15vw", "0vw"],
-          y: ["0vh", "30vh", "-10vh", "0vh"],
-          scale: [1, 1.4, 0.9, 1],
-          rotate: [0, 90, 180, 360]
-        }}
-        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-        className="absolute -left-[10%] top-[10%] h-[60vw] w-[60vw] max-h-[800px] max-w-[800px] rounded-full bg-gradient-to-br from-[#1018df]/60 to-[#49d45f]/40 blur-[100px] md:blur-[160px]"
-      />
-      <motion.div
-        animate={{
-          x: ["0vw", "-20vw", "15vw", "0vw"],
-          y: ["0vh", "-20vh", "20vh", "0vh"],
-          scale: [1, 1.5, 0.8, 1],
-          rotate: [360, 180, 90, 0]
-        }}
-        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-        className="absolute -right-[10%] bottom-[10%] h-[70vw] w-[70vw] max-h-[1000px] max-w-[1000px] rounded-full bg-gradient-to-tl from-[#1018df]/40 to-purple-500/40 blur-[100px] md:blur-[180px]"
-      />
+    <div className="fixed inset-0 z-[-1] overflow-hidden bg-[#e8eef2]">
+      <div className="absolute inset-0 opacity-100 pointer-events-auto">
+        <Plasma 
+          color="#6ea1ff"
+          speed={0.5}
+          direction="forward"
+          scale={1.5}
+          opacity={0.85}
+          mouseInteractive={true}
+        />
+      </div>
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
     </div>
   );
 }
@@ -758,9 +828,14 @@ function Clinic() {
   ];
 
   return (
-    <section id="clinica" className="relative bg-white/60 px-6 py-16 backdrop-blur-[60px] md:px-12 md:py-32 lg:px-16">
+    <section id="clinica" className="relative px-6 py-16 md:px-12 md:py-32 lg:px-16">
+      <div 
+        className="absolute inset-0 -z-10 backdrop-blur-xl bg-gradient-to-b from-white/40 via-white/20 to-transparent pointer-events-none"
+        style={{ WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 80%, transparent 100%)", maskImage: "linear-gradient(to bottom, black 0%, black 80%, transparent 100%)" }}
+      />
+      <div className="absolute top-0 left-0 right-0 h-px bg-white/40 pointer-events-none" />
       <div className="relative z-10 mx-auto max-w-[1280px]">
-        <FadeUp className="mb-16 flex flex-col items-center text-center">
+        <FadeUp className="mb-16 flex flex-col items-center text-center bg-white/60 backdrop-blur-md rounded-[2.5rem] p-8 md:p-16 border border-white/80 shadow-sm mx-auto max-w-[1000px]">
           <p className="mb-6 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>
             Clínica Integral
           </p>
@@ -814,8 +889,8 @@ function Catalog() {
   const visible = active === "todos" ? CATEGORIES : CATEGORIES.filter((item) => item.id === active);
 
   return (
-    <section id="catalogo" className="relative bg-[#f4f7fc]/60 px-6 py-16 backdrop-blur-[60px] md:px-12 md:py-32 lg:px-16">
-      <FadeUp className="relative z-10 mb-16 flex flex-col items-center text-center">
+    <section id="catalogo" className="relative bg-transparent px-6 py-20 md:px-12 md:py-32 lg:px-16">
+      <FadeUp className="relative z-10 mb-16 flex flex-col items-center text-center bg-white/60 backdrop-blur-md rounded-[2.5rem] p-8 md:p-16 border border-white/80 shadow-sm mx-auto max-w-[1000px]">
         <p className="mb-6 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>Catálogo</p>
         <h2 className="mb-6 max-w-[800px] text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(2.4rem, 8vw, 6rem)" }}>
           Soluciones visuales <br />
@@ -898,7 +973,11 @@ function Lookbook() {
   const row2 = [...images.slice(5, 10), ...images.slice(0, 5)];
   
   return (
-    <section id="lookbook" className="relative overflow-hidden bg-[#070d1a]/80 py-16 backdrop-blur-[60px] md:py-32">
+    <section id="lookbook" className="relative overflow-hidden py-16 md:py-32">
+      <div 
+        className="absolute inset-0 -z-10 backdrop-blur-xl bg-gradient-to-b from-transparent via-[#070d1a]/50 to-transparent pointer-events-none"
+        style={{ WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)", maskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)" }}
+      />
       <style>{`
         @keyframes marquee {
           0% { transform: translateX(0%); }
@@ -919,7 +998,7 @@ function Lookbook() {
         }
       `}</style>
       <div className="relative z-10 mb-20 px-6 text-center md:px-12 lg:px-16">
-        <FadeUp>
+        <FadeUp className="bg-[#070d1a]/70 backdrop-blur-md rounded-[2.5rem] p-8 md:p-16 border border-white/10 shadow-lg mx-auto max-w-[1000px]">
           <h2 className="text-balance font-normal leading-[0.95] tracking-[-0.02em] text-white" style={{ ...serif, fontSize: "clamp(2.3rem, 8vw, 5.5rem)" }}>
             No es solo ver bien, <br className="hidden sm:block" />
             <em className="text-[#49d45f]">es cómo te ves viviéndolo.</em>

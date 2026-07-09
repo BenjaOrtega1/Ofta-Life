@@ -28,10 +28,16 @@ function MapFrame() {
 
 export function LocationSection() {
   return (
-    <section id="ubicacion" className="relative bg-white/60 text-foreground backdrop-blur-[60px]">
-      <div className="grid gap-0 lg:grid-cols-[1.22fr_0.78fr] lg:items-stretch">
-        <MapFrame />
-        <div className="self-center px-6 py-16 md:px-12 md:py-24 lg:px-16">
+    <section id="ubicacion" className="relative text-foreground">
+      <div 
+        className="absolute inset-0 -z-10 backdrop-blur-3xl bg-gradient-to-b from-transparent via-white/10 to-white/15 pointer-events-none"
+        style={{ WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 100%)", maskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 100%)" }}
+      />
+      <div className="grid gap-0 lg:grid-cols-[1.22fr_0.78fr] lg:items-stretch lg:p-6 lg:gap-6">
+        <div className="rounded-[2.5rem] overflow-hidden lg:shadow-md">
+          <MapFrame />
+        </div>
+        <div className="self-center px-6 py-12 md:px-12 md:py-16 lg:px-12 bg-white/60 backdrop-blur-md rounded-[2.5rem] border border-white/80 shadow-sm mx-4 lg:mx-0 my-4 lg:my-0">
           <p className="mb-5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>Ubicación</p>
           <h2 className="text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(2.2rem, 7vw, 5rem)" }}>
             Bulnes, atención cercana y agenda directa.
@@ -70,8 +76,12 @@ export function LocationSection() {
         </div>
       </div>
 
-      <div id="agendar" className="relative bg-[#0c1628]/80 px-6 py-16 text-white backdrop-blur-[60px] md:px-12 md:py-20 lg:px-16">
-        <div className="mx-auto max-w-[980px] text-center">
+      <div id="agendar" className="relative px-6 py-16 text-white md:px-12 md:py-20 lg:px-16">
+        <div 
+          className="absolute inset-0 -z-10 backdrop-blur-xl bg-gradient-to-b from-transparent to-[#0c1628]/60 pointer-events-none"
+          style={{ WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 100%)", maskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 100%)" }}
+        />
+        <div className="mx-auto max-w-[980px] text-center bg-[#0c1628]/70 backdrop-blur-md rounded-[2.5rem] p-8 md:p-16 border border-white/10 shadow-lg">
           <span className="inline-flex items-center gap-2.5 text-white">
             <span className="inline-flex flex-col justify-center">
               <span className="text-[30px] font-semibold leading-none tracking-[-0.035em] text-white">OftaLife</span>

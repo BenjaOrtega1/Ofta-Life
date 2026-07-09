@@ -90,8 +90,8 @@ export function ReviewsSection() {
   const avgRating = (LOCAL_REVIEWS.reduce((acc, curr) => acc + curr.rating, 0) / LOCAL_REVIEWS.length).toFixed(1);
 
   return (
-    <section id="resenas" className="relative overflow-hidden bg-white/60 px-6 py-16 backdrop-blur-[60px] md:px-12 md:py-28 lg:px-16">
-      <div className="mb-12 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+    <section id="resenas" className="relative bg-transparent px-6 py-16 md:px-12 md:py-32 lg:px-16">
+      <div className="mb-12 flex flex-col gap-8 md:flex-row md:items-end md:justify-between bg-white/60 backdrop-blur-md rounded-[2.5rem] p-8 md:p-12 border border-white/80 shadow-sm">
         <div>
           <p className="mb-5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>Reseñas</p>
           <h2 className="max-w-[760px] text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(2.2rem, 7vw, 5rem)" }}>

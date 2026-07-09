@@ -13,7 +13,7 @@ const locationDetails = [
 
 function MapFrame() {
   return (
-    <div className="relative min-h-[420px] overflow-hidden bg-[#f4f7fc] lg:min-h-[760px]" aria-label={`Mapa de ubicación de ${business.businessName} en ${business.address}`}>
+    <div className="relative min-h-[300px] overflow-hidden bg-[#f4f7fc] lg:min-h-[760px]" aria-label={`Mapa de ubicación de ${business.businessName} en ${business.address}`}>
       <iframe
         title={`Mapa de ${business.businessName} en ${business.city}`}
         src={business.googleMapsEmbedUrl}
@@ -33,7 +33,7 @@ export function LocationSection() {
         <MapFrame />
         <div className="self-center px-6 py-16 md:px-12 md:py-24 lg:px-16">
           <p className="mb-5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>Ubicación</p>
-          <h2 className="text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(2.6rem, 7vw, 5rem)" }}>
+          <h2 className="text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(2.2rem, 7vw, 5rem)" }}>
             Bulnes, atención cercana y agenda directa.
           </h2>
           <p className="mt-7 max-w-[460px] text-[15px] leading-[1.8] text-foreground/62">
@@ -79,7 +79,7 @@ export function LocationSection() {
             </span>
             <span className="sr-only">{business.businessName}</span>
           </span>
-          <h2 className="mt-8 text-balance font-normal leading-[0.95] tracking-[-0.02em] text-white" style={{ ...serif, fontSize: "clamp(2.7rem, 8vw, 5.8rem)" }}>
+          <h2 className="mt-8 text-balance font-normal leading-[0.95] tracking-[-0.02em] text-white" style={{ ...serif, fontSize: "clamp(2.3rem, 8vw, 5.8rem)" }}>
             OftaLife te acompaña día a día.
           </h2>
           <p className="mx-auto mt-6 max-w-[560px] text-[16px] leading-[1.8] text-white/58">

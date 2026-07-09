@@ -641,7 +641,7 @@ function AnimatedHeroHeading({
   const words = title.split(" ");
 
   return (
-    <HeadingTag className="text-balance font-normal leading-[0.9] tracking-[-0.028em] text-white" style={{ ...serif, fontSize: "clamp(3.1rem, 10vw, 6rem)" }}>
+    <HeadingTag className="text-balance font-normal leading-[0.9] tracking-[-0.028em] text-white" style={{ ...serif, fontSize: "clamp(2.4rem, 10vw, 6rem)" }}>
       {words.map((word, wordIndex) => (
         <motion.span
           key={`${word}-${wordIndex}`}
@@ -758,13 +758,13 @@ function Clinic() {
   ];
 
   return (
-    <section id="clinica" className="relative bg-white/60 px-6 py-24 backdrop-blur-[60px] md:px-12 md:py-32 lg:px-16">
+    <section id="clinica" className="relative bg-white/60 px-6 py-16 backdrop-blur-[60px] md:px-12 md:py-32 lg:px-16">
       <div className="relative z-10 mx-auto max-w-[1280px]">
         <FadeUp className="mb-16 flex flex-col items-center text-center">
           <p className="mb-6 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>
             Clínica Integral
           </p>
-          <h2 className="mb-6 max-w-[800px] text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(2.8rem, 7vw, 5.5rem)" }}>
+          <h2 className="mb-6 max-w-[800px] text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(2.2rem, 7vw, 5.5rem)" }}>
             Cuidado visual privado, <br className="hidden md:block"/>
             <em>cercano y bien resuelto.</em>
           </h2>
@@ -774,7 +774,7 @@ function Clinic() {
         </FadeUp>
 
         <div className="grid gap-6 md:grid-cols-3">
-          <FadeUp delay={0.1} className="group relative min-h-[360px] overflow-hidden rounded-3xl bg-secondary shadow-sm ring-1 ring-black/5 md:col-span-3 lg:h-[480px]">
+          <FadeUp delay={0.1} className="group relative min-h-[300px] overflow-hidden rounded-3xl bg-secondary shadow-sm ring-1 ring-black/5 md:min-h-[360px] md:col-span-3 lg:h-[480px]">
             <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#070d1a]/80 via-[#070d1a]/20 to-transparent" />
             <img src={IMG.clinic} alt="Sala de espera luminosa de una clínica visual" className="h-full w-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" loading="lazy" />
             <div className="absolute bottom-0 left-0 z-20 flex w-full flex-col justify-end p-8 md:p-12 lg:flex-row lg:items-end lg:justify-between">
@@ -814,10 +814,10 @@ function Catalog() {
   const visible = active === "todos" ? CATEGORIES : CATEGORIES.filter((item) => item.id === active);
 
   return (
-    <section id="catalogo" className="relative bg-[#f4f7fc]/60 px-6 py-24 backdrop-blur-[60px] md:px-12 md:py-32 lg:px-16">
+    <section id="catalogo" className="relative bg-[#f4f7fc]/60 px-6 py-16 backdrop-blur-[60px] md:px-12 md:py-32 lg:px-16">
       <FadeUp className="relative z-10 mb-16 flex flex-col items-center text-center">
         <p className="mb-6 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>Catálogo</p>
-        <h2 className="mb-6 max-w-[800px] text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(3rem, 8vw, 6rem)" }}>
+        <h2 className="mb-6 max-w-[800px] text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(2.4rem, 8vw, 6rem)" }}>
           Soluciones visuales <br />
           <em>para tu día a día.</em>
         </h2>
@@ -826,7 +826,8 @@ function Catalog() {
         </p>
       </FadeUp>
 
-      <div className="relative z-10 mb-14 flex flex-wrap justify-center gap-3 md:gap-4" role="tablist" aria-label="Categorías del catálogo">
+      <div className="relative z-10 mb-14 -mx-6 flex overflow-x-auto px-6 pb-4 snap-x snap-mandatory gap-3 md:mx-0 md:flex-wrap md:justify-center md:px-0 md:pb-0 md:snap-none" role="tablist" aria-label="Categorías del catálogo" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <style>{`#catalogo div::-webkit-scrollbar { display: none; }`}</style>
         {["todos", ...CATEGORIES.map((item) => item.id)].map((id) => {
           const label = id === "todos" ? "Todos" : CATEGORIES.find((item) => item.id === id)?.title;
           return (
@@ -835,7 +836,7 @@ function Catalog() {
               type="button"
               onClick={() => setActive(id)}
               className={cx(
-                "rounded-full border px-6 py-3 text-[13px] tracking-wide transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary",
+                "shrink-0 snap-start rounded-full border px-6 py-3 text-[13px] tracking-wide transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary",
                 active === id ? "border-primary bg-primary text-white shadow-lg shadow-primary/20" : "border-foreground/10 bg-white/72 text-foreground/70 hover:border-foreground/30 hover:text-foreground hover:bg-white",
               )}
               role="tab"
@@ -897,7 +898,7 @@ function Lookbook() {
   const row2 = [...images.slice(5, 10), ...images.slice(0, 5)];
   
   return (
-    <section id="lookbook" className="relative overflow-hidden bg-[#070d1a]/80 py-24 backdrop-blur-[60px] md:py-32">
+    <section id="lookbook" className="relative overflow-hidden bg-[#070d1a]/80 py-16 backdrop-blur-[60px] md:py-32">
       <style>{`
         @keyframes marquee {
           0% { transform: translateX(0%); }
@@ -919,7 +920,7 @@ function Lookbook() {
       `}</style>
       <div className="relative z-10 mb-20 px-6 text-center md:px-12 lg:px-16">
         <FadeUp>
-          <h2 className="text-balance font-normal leading-[0.95] tracking-[-0.02em] text-white" style={{ ...serif, fontSize: "clamp(2.8rem, 8vw, 5.5rem)" }}>
+          <h2 className="text-balance font-normal leading-[0.95] tracking-[-0.02em] text-white" style={{ ...serif, fontSize: "clamp(2.3rem, 8vw, 5.5rem)" }}>
             No es solo ver bien, <br className="hidden sm:block" />
             <em className="text-[#49d45f]">es cómo te ves viviéndolo.</em>
           </h2>

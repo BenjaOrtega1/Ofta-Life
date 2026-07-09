@@ -90,11 +90,11 @@ export function ReviewsSection() {
   const avgRating = (LOCAL_REVIEWS.reduce((acc, curr) => acc + curr.rating, 0) / LOCAL_REVIEWS.length).toFixed(1);
 
   return (
-    <section id="resenas" className="relative overflow-hidden bg-white/60 px-6 py-20 backdrop-blur-[60px] md:px-12 md:py-28 lg:px-16">
+    <section id="resenas" className="relative overflow-hidden bg-white/60 px-6 py-16 backdrop-blur-[60px] md:px-12 md:py-28 lg:px-16">
       <div className="mb-12 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="mb-5 text-[12px] tracking-[0.16em] uppercase text-primary" style={mono}>Reseñas</p>
-          <h2 className="max-w-[760px] text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(2.6rem, 7vw, 5rem)" }}>
+          <h2 className="max-w-[760px] text-balance font-normal leading-[0.95] tracking-[-0.02em] text-foreground" style={{ ...serif, fontSize: "clamp(2.2rem, 7vw, 5rem)" }}>
             Historias de quienes confiaron en OftaLife
           </h2>
           <p className="mt-6 max-w-[520px] text-pretty text-[15px] leading-[1.78] text-foreground/60">
